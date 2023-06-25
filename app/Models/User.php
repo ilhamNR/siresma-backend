@@ -2,7 +2,11 @@
 
 namespace App\Models;
 
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Notifications\Notifiable;
 
 /**
  * @property integer $id
@@ -18,8 +22,9 @@ use Illuminate\Database\Eloquent\Model;
  * @property TrashBank $trashBank
  * @property SavingsBalance[] $savingsBalances
  */
-class User extends Model
+class User extends Authenticatable
 {
+    use HasApiTokens, HasFactory, Notifiable;
     /**
      * @var array
      */
