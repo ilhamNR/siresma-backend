@@ -17,7 +17,7 @@ class LoginController extends Controller
             $user = User::where('username', $request->username)->firstOrFail();
             $token = $user->createToken("IDEABOX")->plainTextToken;
             $data = array("id" => $user->id, "username" => $user->username);
-            // return $this->success("Success", $data, 200, $token);
-        }
+            return $this->success("Success", $data, 200, $token);
+        // }
     }
 }
