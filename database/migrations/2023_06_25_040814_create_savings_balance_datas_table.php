@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('savings_balance', function (Blueprint $table) {
+        Schema::create('savings_balance_datas', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained();
             $table->integer('balance');
@@ -31,6 +31,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('savings_balance');
+        Schema::dropIfExists('savings_balance_datas');
     }
 };
