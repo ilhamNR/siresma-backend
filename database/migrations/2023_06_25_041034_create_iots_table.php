@@ -13,13 +13,11 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('savings_balance_datas', function (Blueprint $table) {
+        Schema::create('iots', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained();
-            $table->integer('balance');
-            $table->string('trash_category');
+            $table->integer('code');
             $table->integer('weight');
-            $table->foreignId('iot_id')->constrained();
+            $table->foreignId('garbage_savings_data_id')->constrained();
             $table->timestamps();
         });
     }
@@ -31,6 +29,9 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('savings_balance_datas');
+        Schema::table('iots', function (Blueprint $table) {
+            $table->dropForeign(['garbage_savings_data_id']);
+        });
+        Schema::dropIfExists('iots');
     }
 };

@@ -22,7 +22,7 @@ class RegisterController extends Controller
             if ($existingUsername != null) {
                 return $this->error("Username telah terdaftar", 401);
             } else if ($existingEmail != null) {
-                return $this->error("Email Telah Terdaftar", null, 401);
+                return $this->error("Email Telah Terdaftar", 401);
             } else {
                 DB::beginTransaction();
                 $user = User::create([
