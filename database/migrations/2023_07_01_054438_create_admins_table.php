@@ -13,8 +13,13 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('trash_banks', function (Blueprint $table) {
-            $table->string("description");
+        Schema::create('admins', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->string('username');
+            $table->string('email');
+            $table->string('phone');
+            $table->string('password');
+            $table->timestamps();
         });
     }
 
@@ -25,8 +30,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('trash_banks', function (Blueprint $table) {
-            $table->dropColumn("description");
-        });
+        Schema::dropIfExists('admins');
     }
 };

@@ -13,8 +13,8 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('trash_banks', function (Blueprint $table) {
-            //
+        Schema::table('garbage_savings_datas', function (Blueprint $table) {
+            $table->foreign(['user_id'])->references(['id'])->on('users');
         });
     }
 
@@ -25,8 +25,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('trash_banks', function (Blueprint $table) {
-            //
+        Schema::table('garbage_savings_datas', function (Blueprint $table) {
+            $table->dropForeign('garbage_savings_datas_user_id_foreign');
         });
     }
 };

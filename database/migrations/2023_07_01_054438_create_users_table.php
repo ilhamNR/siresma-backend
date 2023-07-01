@@ -14,12 +14,12 @@ return new class extends Migration
     public function up()
     {
         Schema::create('users', function (Blueprint $table) {
-            $table->id();
+            $table->bigIncrements('id');
             $table->string('username');
             $table->string('full_name');
             $table->string('email');
-            $table->foreignId('trash_bank_id')->constrained()->nullable();
-            $table->integer('phone');
+            $table->unsignedBigInteger('trash_bank_id')->nullable()->index('users_trash_bank_id_foreign');
+            $table->string('phone', 20);
             $table->string('password');
             $table->timestamps();
         });
@@ -32,9 +32,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropForeign(['trash_bank_id']);
-        });
         Schema::dropIfExists('users');
     }
 };

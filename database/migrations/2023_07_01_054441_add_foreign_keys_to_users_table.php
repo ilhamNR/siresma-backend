@@ -13,11 +13,8 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('trash_banks', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->date('shipment_date');
-            $table->timestamps();
+        Schema::table('users', function (Blueprint $table) {
+            $table->foreign(['trash_bank_id'])->references(['id'])->on('trash_banks');
         });
     }
 
@@ -28,6 +25,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('trash_banks');
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropForeign('users_trash_bank_id_foreign');
+        });
     }
 };

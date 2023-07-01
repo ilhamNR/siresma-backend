@@ -13,13 +13,8 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('admins', function (Blueprint $table) {
-            $table->id();
-            $table->string('username');
-            $table->string('email');
-            $table->string('phone');
-            $table->string('password');
-            $table->timestamps();
+        Schema::table('trash_store_logs', function (Blueprint $table) {
+            $table->foreign(['user_id'])->references(['id'])->on('users');
         });
     }
 
@@ -30,6 +25,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('admins');
+        Schema::table('trash_store_logs', function (Blueprint $table) {
+            $table->dropForeign('trash_store_logs_user_id_foreign');
+        });
     }
 };
