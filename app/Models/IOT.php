@@ -24,7 +24,7 @@ class IOT extends Model
     /**
      * @var array
      */
-    protected $fillable = ['code', 'weight', 'created_at', 'updated_at'];
+    protected $fillable = ['garbage_savings_data_id','code', 'weight', 'created_at', 'updated_at'];
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
