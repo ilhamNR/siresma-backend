@@ -13,11 +13,14 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('iots', function (Blueprint $table) {
+        Schema::create('garbage_savings_datas', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->integer('code');
-            $table->integer('weight');
-            $table->unsignedBigInteger('garbage_savings_data_id')->nullable()->index('iots_garbage_savings_data_id_foreign');
+            $table->unsignedBigInteger('user_id')->index('garbage_savings_datas_user_id_foreign');
+            $table->integer('balance');
+            $table->string('trash_category');
+            $table->integer('weight')->nullable();
+            $table->string('generated_code');
+            $table->date('store_date');
             $table->timestamps();
         });
     }
@@ -29,6 +32,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('iots');
+        Schema::dropIfExists('garbage_savings_datas');
     }
 };
