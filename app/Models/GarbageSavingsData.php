@@ -16,12 +16,14 @@ use Illuminate\Database\Eloquent\Model;
  * @property User $user
  * @property Iot $iot
  */
-class SavingsBalanceData extends Model
+class GarbageSavingsData extends Model
 {
     /**
      * @var array
      */
-    protected $fillable = ['user_id', 'iot_id', 'balance', 'trash_category', 'weight', 'created_at', 'updated_at'];
+    protected $table = 'garbage_savings_datas';
+
+    protected $fillable = ['user_id', 'balance', 'trash_category', 'weight', 'generated_code', 'store_date', 'created_at', 'updated_at'];
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo

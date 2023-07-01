@@ -10,6 +10,7 @@ use App\Traits\APIResponseTrait;
 class TrashBankController extends Controller
 {
     use APIResponseTrait;
+    
     public function getBankSampah(){
         $trashBank = TrashBank::all();
         return $this->success("Success",$trashBank, 200);

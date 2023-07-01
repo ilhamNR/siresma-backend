@@ -14,8 +14,9 @@ class HomeController extends Controller
     public function index(Request $request)
     {
         // $location = $request->location;
-        $location = TrashBank::findorFail($request->location);
+        $location = TrashBank::select('id', 'name', 'description')->findorFail($request->location);
 
+        // $trashSummary =
         return $this->success("success", $location, 200);
     }
 }
