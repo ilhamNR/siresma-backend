@@ -17,7 +17,7 @@ class TrashBank extends Model
     /**
      * @var array
      */
-    protected $fillable = ['name', 'shipment_date', 'created_at', 'updated_at'];
+    protected $fillable = ['name', 'description', 'created_at', 'updated_at'];
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany

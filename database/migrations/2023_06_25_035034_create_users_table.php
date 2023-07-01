@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('username');
             $table->string('full_name');
             $table->string('email');
-            $table->foreignId('trash_bank_id')->constrained();
+            $table->foreignId('trash_bank_id')->constrained()->nullable();
             $table->integer('phone');
             $table->string('password');
             $table->timestamps();
