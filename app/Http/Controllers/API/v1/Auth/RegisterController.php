@@ -15,7 +15,7 @@ class RegisterController extends Controller
 
     public function store(Request $request)
     {
-        // try {
+        try {
             $existingUsername = User::where('username', $request->username)->first();
             $existingEmail = User::where('email', $request->email)->first();
 
@@ -37,8 +37,8 @@ class RegisterController extends Controller
             }
 
             return $this->success("Success", null, 200);
-        // } catch (\Exception $e) {
-        //     return $this->error("Failed", 401);
-        // }
+        } catch (\Exception $e) {
+            return $this->error("Failed", 401);
+        }
     }
 }
