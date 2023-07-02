@@ -36,6 +36,7 @@ Route::group(['prefix' => 'bank-sampah', 'middleware' => ['auth:sanctum']], func
 
 Route::group(['prefix' => 'trash', 'middleware' => ['auth:sanctum']], function () {
     Route::post('store', [TrashController::class, 'storeTrash']);
+    Route::get('list', [TrashController::class, 'list']);
 });
 
 Route::group(['prefix' => 'trash'], function () {

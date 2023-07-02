@@ -11,11 +11,16 @@ use Illuminate\Support\Str;
 use App\Models\IOT;
 use Illuminate\Support\Facades\DB;
 
-
 class TrashController extends Controller
 {
     use APIResponseTrait;
 
+    public function list()
+    {
+        $user = Auth::user()->id;
+        $data = GarbageSavingsData::where('user_id', $user)->get();
+        return $this->success('Success', $data, 200);
+    }
     public function storeTrash(Request $request)
     {
         $code = Str::random(7);
