@@ -7,17 +7,20 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Traits\APIResponseTrait;
 use Illuminate\Support\Facades\Auth;
+
 class LoginController extends Controller
 {
     use APIResponseTrait;
 
-    public function store(Request $request)
+    public function store(Request $request, $id = null)
     {
-        // if (Auth::attempt(['username' => $request->username, 'password' => $request->password])) {
+        if (Auth::attempt(['username' => $request->username, 'password' => $request->password])) {
             $user = User::where('username', $request->username)->firstOrFail();
-            $token = $user->createToken("IDEABOX")->plainTextToken;
+            $token = $user->createToken("SIRESMA")->plainTextToken;
             $data = array("id" => $user->id, "username" => $user->username);
             return $this->success("Success", $data, 200, $token);
-        // }
+        }else{
+            return $this->error("Username atau password kamu salah", 401);
+        }
     }
 }
