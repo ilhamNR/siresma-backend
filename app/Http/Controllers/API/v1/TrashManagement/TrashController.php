@@ -9,6 +9,7 @@ use App\Traits\APIResponseTrait;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use App\Models\IOT;
+use Illuminate\Support\Facades\DB;
 
 
 class TrashController extends Controller
@@ -20,29 +21,40 @@ class TrashController extends Controller
         $code = Str::random(7);
         $generatedCode = Str::upper($code);
 
-        GarbageSavingsData::create([
-            'user_id' => 1,
-            'balance' => 10000,
-            'trash_category' => $request->trash_category,
-            'generated_code' => $generatedCode,
-            'store_date' => $request->store_date
-        ]);
-
-        return $this->success('Success',200);
+        try {
+            DB::beginTransaction();
+            GarbageSavingsData::create([
+                'user_id' => Auth::user()->id,
+                'balance' => 10000,
+                'trash_category' => $request->trash_category,
+                'generated_code' => $generatedCode,
+                'store_date' => $request->store_date
+            ]);
+            DB::commit();
+            return $this->success('Success', 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->error("Failed", 401);
+        }
     }
 
-    public function connectIOT(Request $request){
+    public function connectIOT(Request $request)
+    {
         $trashStore = GarbageSavingsData::where('generated_code', $request->code)->first();
-        // dd($trashStore->id);
-        IOT::create([
-             'weight' => $request->weight,
-             'garbage_savings_data_id' => $trashStore->id
-        ]);
 
-        $trashStore->update([
-            'weight' => $request->weight
-        ]);
+        try {
+            IOT::create([
+                'weight' => $request->weight,
+                'garbage_savings_data_id' => $trashStore->id
+            ]);
 
-        return $this->success($trashStore,200);
+            $trashStore->update([
+                'weight' => $request->weight
+            ]);
+            return $this->success($trashStore, 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->error("Failed", 401);
+        }
     }
 }
