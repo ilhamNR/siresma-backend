@@ -7,6 +7,7 @@ use App\Http\Controllers\API\v1\Auth\LoginController;
 use App\Http\Controllers\API\v1\Home\HomeController;
 use App\Http\Controllers\API\v1\TrashManagement\TrashBankController;
 use App\Http\Controllers\API\v1\TrashManagement\TrashController;
+use App\Http\Controllers\API\v1\Auth\LogoutController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,17 +23,25 @@ use App\Http\Controllers\API\v1\TrashManagement\TrashController;
 Route::group(['prefix' => 'auth'], function () {
     Route::resource('login', LoginController::class);
     Route::resource('registration', RegisterController::class);
-    // Route::resource('emailvalidation', EmailValidationController::class);
-    // Route::resource('emailverification', EmailVerificationController::class);
-    // Route::resource('emailconfirmation', EmailConfirmationController::class);
 });
-Route::resource('home', HomeController::class);
-Route::get('/bank-sampah/list', [TrashController::class, 'getBankSampah']);
+
+Route::group(['prefix' => 'home', 'middleware' => ['auth:sanctum']], function () {
+    Route::get('/', [HomeController::class, 'index']);
+});
+
+Route::group(['prefix' => 'bank-sampah', 'middleware' => ['auth:sanctum']], function () {
+    Route::get('list', [TrashBankController::class, 'getBankSampah']);
+    Route::post('choose', [TrashBankController::class, 'chooseBankSampah']);
+});
+
+Route::group(['prefix' => 'trash', 'middleware' => ['auth:sanctum']], function () {
+    Route::post('store', [TrashController::class, 'storeTrash']);
+});
 
 Route::group(['prefix' => 'trash'], function () {
-    Route::post('store', [TrashController::class, 'storeTrash']);
     Route::post('iot-connect', [TrashController::class, 'connectIOT']);
 });
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+
+Route::group(['prefix' => 'auth', 'middleware' => ['auth:sanctum']], function() {
+    Route::get('logout', [LogoutController::class, 'logout']);
 });
