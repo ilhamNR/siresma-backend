@@ -18,7 +18,7 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id')->index('garbage_savings_datas_user_id_foreign');
             $table->integer('balance');
             $table->string('trash_category');
-            $table->integer('weight')->nullable();
+            $table->float('weight')->nullable();
             $table->string('generated_code');
             $table->date('store_date');
             $table->timestamps();
