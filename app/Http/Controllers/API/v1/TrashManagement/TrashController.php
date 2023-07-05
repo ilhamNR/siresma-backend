@@ -56,7 +56,24 @@ class TrashController extends Controller
             $trashStore->update([
                 'weight' => $request->weight
             ]);
+            DB::commit();
             return $this->success($trashStore, 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->error("Failed", 401);
+        }
+    }
+
+    public function updateWeight(Request $request)
+    {
+        $trash = GarbageSavingsData::findOrFail($request->garbage_savings_id);
+        try {
+            DB::beginTransaction();
+            $trash->update([
+                'weight' => $request->weight
+            ]);
+            DB::commit();
+            return $this->success("Success", 200);
         } catch (\Exception $e) {
             DB::rollBack();
             return $this->error("Failed", 401);
