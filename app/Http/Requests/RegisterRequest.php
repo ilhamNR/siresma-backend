@@ -28,7 +28,7 @@ class RegisterRequest extends FormRequest
             : 'required|max:255',
             'full_name' => request()->route('auth/registration') ? 'required|max:255'. request()->route('auth/registration')
             : 'required|max:255',
-            'email' => request()->route('auth/registration') ? 'required|max:255'. request()->route('auth/registration')
+            'phone' => request()->route('auth/registration') ? 'required|max:255'. request()->route('auth/registration')
             : 'required|max:255',
             'no_kk' => request()->route('auth/registration') ? 'required|max:255'. request()->route('auth/registration')
             : 'required|max:255',
