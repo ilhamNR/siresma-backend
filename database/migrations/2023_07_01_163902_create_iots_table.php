@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('iots', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->integer('code')->nullable();
+            $table->string('code', 7)->nullable();
             $table->integer('weight');
             $table->unsignedBigInteger('garbage_savings_data_id')->nullable()->index('iots_garbage_savings_data_id_foreign');
             $table->timestamps();
