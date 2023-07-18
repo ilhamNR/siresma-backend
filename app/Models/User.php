@@ -28,7 +28,7 @@ class User extends Authenticatable
     /**
      * @var array
      */
-    protected $fillable = ['trash_bank_id', 'username', 'full_name', 'email', 'no_kk', 'phone', 'password', 'created_at', 'updated_at'];
+    protected $fillable = ['trash_bank_id', 'username', 'full_name', 'email','address', 'no_kk', 'phone', 'password', 'created_at', 'updated_at'];
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
