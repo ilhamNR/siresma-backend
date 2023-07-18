@@ -40,8 +40,12 @@ Route::group(['prefix' => 'trash', 'middleware' => ['auth:sanctum']], function (
     Route::post('/weight/update', [TrashController::class, 'updateWeight']);
 });
 
-Route::group(['prefix' => 'trash'], function () {
-    Route::post('iot-connect', [TrashController::class, 'connectIOT']);
+Route::group(['prefix' => 'iot'], function () {
+    Route::post('store', [TrashController::class, 'storeIOT']);
+});
+
+Route::group(['prefix' => 'iot', 'middleware' => ['auth:sanctum']], function () {
+    Route::put('connect', [TrashController::class, 'connectIOT']);
 });
 
 Route::group(['prefix' => 'auth', 'middleware' => ['auth:sanctum']], function() {
