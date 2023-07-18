@@ -45,7 +45,7 @@ Route::group(['prefix' => 'iot'], function () {
 });
 
 Route::group(['prefix' => 'iot', 'middleware' => ['auth:sanctum']], function () {
-    Route::put('connect', [TrashController::class, 'connectIOT']);
+    Route::post('connect', [TrashController::class, 'connectIOT']);
 });
 
 Route::group(['prefix' => 'auth', 'middleware' => ['auth:sanctum']], function() {
