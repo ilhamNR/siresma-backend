@@ -38,6 +38,6 @@ class GarbageSavingsData extends Model
      */
     public function iot()
     {
-        return $this->belongsTo('App\Models\Iot');
+        return $this->hasOne(IOT::class, 'id', 'iot_id');
     }
 }
