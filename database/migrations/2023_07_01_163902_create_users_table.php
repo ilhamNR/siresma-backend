@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('email');
             $table->unsignedBigInteger('trash_bank_id')->nullable()->index('users_trash_bank_id_foreign');
             $table->string('phone', 20);
+            $table->string('no_kk');
             $table->string('password');
             $table->timestamps();
         });
