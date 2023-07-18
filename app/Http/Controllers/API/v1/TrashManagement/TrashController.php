@@ -73,12 +73,15 @@ class TrashController extends Controller
 
     public function connectIOT(Request $request)
     {
+        $redeemed_iot = NULL;
         $iot_data = IOT::where('code', $request->code)->first();
-        $garbage_savings_data = GarbageSavingsData::where('id', $request->garbage_savings_data_id)->first();
-        $redeemed_iot = GarbageSavingsData::where('iot_id', $iot_data->id)->first();
+        $garbage_savings_data = GarbageSavingsData::findOrFail($request->garbage_savings_data_id);
         if (is_null($iot_data)) {
             return $this->error("Kode tidak valid", 401);
-        } else if (isset($redeemed_iot)) {
+        } 
+        $redeemed_iot = GarbageSavingsData::where('iot_id', $iot_data->id)->first();
+
+        if (isset($redeemed_iot)) {
             return $this->error("IOT sudah dihubungkan ke data sampah lain", 401);
         } else if (is_null($garbage_savings_data)) {
             return $this->error("Data stor sampah tidak valid", 401);
@@ -92,6 +95,7 @@ class TrashController extends Controller
                     'iot_id' =>  $iot_data->id
                 ]);
                 DB::commit();
+                return $this->success("Data IOT sudah terhubung", 200);
             } catch (\Exception $e) {
                 DB::rollBack();
                 return $this->error("Failed", 401);
