@@ -29,8 +29,8 @@ class IOT extends Model
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function savingsBalances()
+    public function trashData()
     {
-        return $this->hasMany('App\Models\SavingsBalanceData');
+        return $this->belongsTo(GarbageSavingsData::class, 'iot_id');
     }
 }
