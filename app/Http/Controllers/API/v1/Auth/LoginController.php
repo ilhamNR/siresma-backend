@@ -17,7 +17,13 @@ class LoginController extends Controller
         if (Auth::attempt(['username' => $request->username, 'password' => $request->password])) {
             $user = User::where('username', $request->username)->firstOrFail();
             $token = $user->createToken("SIRESMA")->plainTextToken;
-            $data = array("id" => $user->id, "full_name" => $user->full_name, "phone" => $user->phone, "email" => $user->email);
+            $data = array(
+                "id" => $user->id, 
+                "full_name" => $user->full_name, 
+                "phone" => $user->phone, 
+                "address" => $user->address,
+                "no_kk" => $user->no_kk
+            );
             return $this->success("Success", $data, 200, $token);
         }else{
             return $this->error("Username atau password kamu salah", 401);
