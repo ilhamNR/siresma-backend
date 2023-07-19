@@ -85,12 +85,12 @@ class TrashController extends Controller
         }
     }
 
-    public function calculatePrice($garbage_savings_data, $weight){
+    public function calculatePrice($garbage_savings_data, $weight)
+    {
         $trash_category = TrashCategory::findOrFail($garbage_savings_data->trash_category_id);
         $total_price = $trash_category->price * $weight;
 
         return $total_price;
-
     }
     public function connectIOT(Request $request)
     {
@@ -143,13 +143,18 @@ class TrashController extends Controller
 
     public function getCategories()
     {
-        $data = TrashCategory::get();
-        $data = $data->map(function ($item) {
-            unset($item->created_at);
-            unset($item->updated_at);
-            return $item;
-        });
+        try {
+            $data = TrashCategory::get();
+            $data = $data->map(function ($item) {
+                unset($item->created_at);
+                unset($item->updated_at);
+                return $item;
+            });
 
-        return $this->success($data, 200);
+            return $this->success($data, 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->error("Failed", 401);
+        }
     }
 }
