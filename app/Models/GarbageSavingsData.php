@@ -23,7 +23,7 @@ class GarbageSavingsData extends Model
      */
     protected $table = 'garbage_savings_datas';
 
-    protected $fillable = ['user_id', 'balance', 'trash_category', 'weight', 'iot_id', 'store_date', 'created_at', 'updated_at'];
+    protected $fillable = ['user_id', 'price', 'trash_category_id', 'weight', 'iot_id', 'store_date', 'created_at', 'updated_at'];
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
@@ -39,5 +39,9 @@ class GarbageSavingsData extends Model
     public function iot()
     {
         return $this->hasOne(IOT::class, 'id', 'iot_id');
+    }
+    public function trashCategory()
+    {
+        return $this->hasOne(TrashCategory::class, 'id', 'trash_category_id');
     }
 }
