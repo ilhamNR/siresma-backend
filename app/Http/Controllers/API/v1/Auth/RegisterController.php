@@ -19,12 +19,12 @@ class RegisterController extends Controller
         try {
             $user = $request->validated();
             $existingUsername = User::where('username', $request->username)->first();
-            $existingEmail = User::where('email', $request->email)->first();
+            $existingPhone = User::where('phone', $request->phone)->first();
 
             if ($existingUsername != null) {
                 return $this->error("Username telah terdaftar", 401);
-            } else if ($existingEmail != null) {
-                return $this->error("Email Telah Terdaftar", 401);
+            } else if ($existingPhone != null) {
+                return $this->error("Nomor WA Telah Terdaftar", 401);
             } else {
                 DB::beginTransaction();
                 $user = User::create([
