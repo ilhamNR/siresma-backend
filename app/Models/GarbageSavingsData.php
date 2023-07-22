@@ -23,7 +23,7 @@ class GarbageSavingsData extends Model
      */
     protected $table = 'garbage_savings_datas';
 
-    protected $fillable = ['user_id', 'user_balance' ,'admin_balance', 'trash_category_id', 'weight', 'iot_id', 'store_date', 'created_at', 'updated_at'];
+    protected $fillable = ['user_id', 'user_balance' ,'admin_balance','trash_bank_id', 'trash_category_id', 'weight', 'iot_id', 'store_date', 'created_at', 'updated_at'];
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
@@ -43,5 +43,8 @@ class GarbageSavingsData extends Model
     public function trashCategory()
     {
         return $this->hasOne(TrashCategory::class, 'id', 'trash_category_id');
+    }
+    public function trashBank(){
+        return $this->belongsTo(TrashBank::class);
     }
 }
