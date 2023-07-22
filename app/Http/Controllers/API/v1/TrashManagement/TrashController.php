@@ -63,7 +63,7 @@ class TrashController extends Controller
         DB::beginTransaction();
         GarbageSavingsData::create([
             'user_id' => Auth::user()->id,
-
+            'trash_bank_id' => $request->trash_bank_id,
             'trash_category_id' => $request->trash_category_id,
             'store_date' => $request->store_date
         ]);
