@@ -9,6 +9,8 @@ use App\Traits\APIResponseTrait;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use App\Http\Requests\RegisterRequest;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Storage;
 
 class RegisterController extends Controller
 {
@@ -16,16 +18,25 @@ class RegisterController extends Controller
 
     public function store(RegisterRequest $request)
     {
-        try {
+        // try {
+           
+            // dd($fileName);
             $user = $request->validated();
             $existingUsername = User::where('username', $request->username)->first();
             $existingPhone = User::where('phone', $request->phone)->first();
-
             if ($existingUsername != null) {
                 return $this->error("Username telah terdaftar", 401);
             } else if ($existingPhone != null) {
                 return $this->error("Nomor WA Telah Terdaftar", 401);
             } else {
+                if(isset($request->profile_picture)){
+                    $fileName = $request->profile_picture->hashName();
+                    $files = Storage::disk('public')->put('profile_picture/', $request->profile_picture);
+                }
+                else{
+                    $fileName = NULL;
+                }
+                
                 DB::beginTransaction();
                 $user = User::create([
                     'username' => $request->username,
@@ -35,14 +46,15 @@ class RegisterController extends Controller
                     'no_kk' => $request->no_kk,
                     'trash_bank_id' => $request->trash_bank_id,
                     'phone' => $request->phone,
-                    'password' => Hash::make($request->password)
+                    'password' => Hash::make($request->password),
+                    'profile_picture' => $fileName
                 ]);
                 DB::commit();
             }
 
             return $this->success("Success", null, 200);
-        } catch (\Exception $e) {
-            return $this->error("Failed", 401);
-        }
+        // } catch (\Exception $e) {
+        //     return $this->error("Failed", 401);
+        // }
     }
 }

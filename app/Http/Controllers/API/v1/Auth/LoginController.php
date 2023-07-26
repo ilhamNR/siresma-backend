@@ -17,12 +17,18 @@ class LoginController extends Controller
         if (Auth::attempt(['username' => $request->username, 'password' => $request->password])) {
             $user = User::where('username', $request->username)->firstOrFail();
             $token = $user->createToken("SIRESMA")->plainTextToken;
+            if($user->profile_picture == ("" or NULL)){
+                $profile_picture = asset('NULLpp.png');
+            } else{
+                $profile_picture = asset('storage/profile_picture/'. $user->profile_picture);
+            }
             $data = array(
                 "id" => $user->id, 
                 "full_name" => $user->full_name, 
                 "phone" => $user->phone, 
                 "address" => $user->address,
-                "no_kk" => $user->no_kk
+                "no_kk" => $user->no_kk,
+                "profile_picture" =>$profile_picture
             );
             return $this->success("Success", $data, 200, $token);
         }else{
