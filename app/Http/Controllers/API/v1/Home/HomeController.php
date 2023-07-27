@@ -15,8 +15,12 @@ class HomeController extends Controller
     public function index()
     {
         try {
-            $location = TrashBank::select('id', 'name', 'description')->findorFail(Auth::user()->trash_bank_id);
-            return $this->success("success", $location, 200);
+            if (isset(Auth::user()->trash_bank_id)) {
+                $location = TrashBank::select('id', 'name', 'description')->findorFail(Auth::user()->trash_bank_id);
+                return $this->success("success", $location, 200);
+            } else{
+                return $this->success("Anda Belum memilih lokasi bank sampah", NULL, 200);
+            }
         } catch (\Exception $e) {
             return $this->error("Failed", 401);
         }
