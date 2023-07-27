@@ -3,6 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rules\File;
+use Illuminate\Validation\Rules\Password;
 
 class RegisterRequest extends FormRequest
 {
@@ -35,7 +37,8 @@ class RegisterRequest extends FormRequest
             'password' => request()->route('auth/registration') ? 'required|max:255'. request()->route('auth/registration')
             : 'required|max:255',
             'address' => request()->route('auth/registration') ? 'required|max:255'. request()->route('auth/registration')
-            : 'required|max:255'
-        ];
+            : 'required|max:255',
+            'profile_picture' =>  request()->route('auth/registration') ? 'nullable'. request()->route('auth/registration') : File::image()->max(2048) ,
+        ];     
     }
 }
