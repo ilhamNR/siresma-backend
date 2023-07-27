@@ -14,10 +14,10 @@ return new class extends Migration
     public function up()
     {
         Schema::table('garbage_savings_datas', function (Blueprint $table) {
-            // // use this if there's already inserted data on garbage savings table
-            // $table->unsignedBigInteger('trash_category_id')->index('garbage_savings_datas_trash_category_id_foreign')->after('user_id')->nullable();
-
+            // use this if there's already inserted data on garbage savings table
             $table->unsignedBigInteger('trash_category_id')->index('garbage_savings_datas_trash_category_id_foreign')->after('user_id')->nullable();
+
+            // $table->unsignedBigInteger('trash_category_id')->index('garbage_savings_datas_trash_category_id_foreign')->after('user_id')->nullable();
 
             $table->foreign(['trash_category_id'])->references(['id'])->on('trash_categories');
         });
