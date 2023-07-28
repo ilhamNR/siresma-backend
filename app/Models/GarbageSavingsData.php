@@ -23,7 +23,7 @@ class GarbageSavingsData extends Model
      */
     protected $table = 'garbage_savings_datas';
 
-    protected $fillable = ['user_id', 'price', 'trash_category_id', 'weight', 'iot_id', 'store_date', 'created_at', 'updated_at'];
+    protected $fillable = ['user_id', 'price', 'trash_category_id', 'status','weight', 'iot_id', 'store_date', 'created_at', 'updated_at'];
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo

@@ -11,6 +11,7 @@ use Illuminate\Support\Str;
 use App\Models\IOT;
 use Illuminate\Support\Facades\DB;
 use App\Models\TrashCategory;
+use App\Models\TransactionLog;
 
 use function PHPSTORM_META\map;
 
@@ -60,15 +61,15 @@ class TrashController extends Controller
     public function storeTrash(Request $request)
     {
         try {
-        DB::beginTransaction();
-        GarbageSavingsData::create([
-            'user_id' => Auth::user()->id,
+            DB::beginTransaction();
+            GarbageSavingsData::create([
+                'user_id' => Auth::user()->id,
 
-            'trash_category_id' => $request->trash_category_id,
-            'store_date' => $request->store_date
-        ]);
-        DB::commit();
-        return $this->success('Success', 200);
+                'trash_category_id' => $request->trash_category_id,
+                'store_date' => $request->store_date
+            ]);
+            DB::commit();
+            return $this->success('Success', 200);
         } catch (\Exception $e) {
             DB::rollBack();
             return $this->error("Failed", 401);
@@ -97,6 +98,29 @@ class TrashController extends Controller
         $total_price = $trash_category->price * $weight;
 
         return $total_price;
+    }
+
+    public function createTransactionLog($amount, $user_id, $type, $garbage_savings_data)
+    {
+        if ($type == "STORE") {
+            DB::beginTransaction();
+            TransactionLog::create([
+                'code' => "STR0001",
+                'type' => "STORE",
+                'user_id' => $user_id,
+                'amount' => $amount,
+                'garbage_savings_data' => $garbage_savings_data
+
+            ]);
+        } else if ($type == "WITHDRAW") {
+            DB::beginTransaction();
+            TransactionLog::create([
+                'code' => "WDR0001",
+                'type' => "WITHDRAW",
+                'user_id' => $user_id,
+                'amount' => $amount,
+            ]);
+        }
     }
     public function connectIOT(Request $request)
     {
