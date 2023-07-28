@@ -61,15 +61,15 @@ class TrashController extends Controller
     public function storeTrash(Request $request)
     {
         try {
-            DB::beginTransaction();
-            GarbageSavingsData::create([
-                'user_id' => Auth::user()->id,
-
-                'trash_category_id' => $request->trash_category_id,
-                'store_date' => $request->store_date
-            ]);
-            DB::commit();
-            return $this->success('Success', 200);
+        DB::beginTransaction();
+        GarbageSavingsData::create([
+            'user_id' => Auth::user()->id,
+            'trash_bank_id' => $request->trash_bank_id,
+            'trash_category_id' => $request->trash_category_id,
+            'store_date' => $request->store_date
+        ]);
+        DB::commit();
+        return $this->success('Success', 200);
         } catch (\Exception $e) {
             DB::rollBack();
             return $this->error("Failed", 401);
@@ -141,10 +141,16 @@ class TrashController extends Controller
         } else {
 
             try {
+                // calculate price
+                $total_price = TrashController::calculatePrice($garbage_savings_data, $iot_data->weight);
+                $admin_balance = $total_price*40/100;
+                $user_balance = $total_price*60/100;
+
                 DB::beginTransaction();
                 $garbage_savings_data->update([
                     'iot_id' =>  $iot_data->id,
-                    'price' => TrashController::calculatePrice($garbage_savings_data, $iot_data->weight)
+                    'user_balance' => $user_balance,
+                    'admin_balance' => $admin_balance
                 ]);
                 DB::commit();
                 return $this->success("Data IOT sudah terhubung", 200);
