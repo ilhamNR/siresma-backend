@@ -16,7 +16,8 @@ class LoginController extends Controller
     {
         if(is_null(User::where('id', $request->user_id)->first())){
             return $this->error("User tidak ditemukan", 401);
-        }else if (User::where('username', $request->username)->first()->is_verified == 0) {
+        }
+        if (User::where('username', $request->username)->first()->is_verified == 0) {
             $otpController = new OTPController(); // Instantiate an object of OTPController
             $otpController->createOTP(User::where('username', $request->username)->first()->id);
             return $this->success("Akun belum terverifikasi, silahkan verikasi OTP",User::where('username', $request->username)->first()->id,401);
