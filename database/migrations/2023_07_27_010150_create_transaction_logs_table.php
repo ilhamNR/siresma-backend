@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('type');
             $table->unsignedBigInteger('user_id')->index('transaction_logs_user_id_foreign');
             $table->unsignedBigInteger('garbage_savings_data_id')->index('transaction_logs_garbage_savings_data_id_foreign');
-            $table->integer('ammount');
+            $table->integer('amount');
             $table->integer('is_approved')->default(0);
             $table->timestamps();
         });
