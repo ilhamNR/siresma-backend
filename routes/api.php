@@ -8,6 +8,7 @@ use App\Http\Controllers\API\v1\Home\HomeController;
 use App\Http\Controllers\API\v1\TrashManagement\TrashBankController;
 use App\Http\Controllers\API\v1\TrashManagement\TrashController;
 use App\Http\Controllers\API\v1\Auth\LogoutController;
+use App\Http\Controllers\API\v1\Auth\OTPController;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,6 +24,8 @@ use App\Http\Controllers\API\v1\Auth\LogoutController;
 Route::group(['prefix' => 'auth'], function () {
     Route::resource('login', LoginController::class);
     Route::resource('registration', RegisterController::class);
+    Route::post('/otp/create', [OTPController::class, 'createOTP']);
+    Route::post('verify', [OTPController::class, 'verifyAccount']);
 });
 
 Route::group(['prefix' => 'home', 'middleware' => ['auth:sanctum']], function () {

@@ -13,9 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->integer('is_verified')->after('password')->default(0);
-         });
+        Schema::table('otps', function (Blueprint $table) {
+            $table->foreign(['user_id'])->references(['id'])->on('users');
+        });
     }
 
     /**
@@ -25,8 +25,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('is_verified');
-         });
+        Schema::table('otps', function (Blueprint $table) {
+            $table->dropForeign('otps_user_id_foreign');
+        });
     }
 };

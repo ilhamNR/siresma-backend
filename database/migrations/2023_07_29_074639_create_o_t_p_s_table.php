@@ -13,9 +13,14 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->integer('is_verified')->after('password')->default(0);
-         });
+        Schema::create('otps', function (Blueprint $table) {
+            $table->id();
+            $table->string('code');
+            $table->unsignedBigInteger('user_id')->index('otps_user_id_foreign');
+            $table->string('number');
+            $table->integer('is_activated');
+            $table->timestamps();
+        });
     }
 
     /**
@@ -25,8 +30,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('is_verified');
-         });
+        Schema::dropIfExists('otps');
     }
 };
