@@ -62,7 +62,7 @@ class TrashController extends Controller
     }
     public function storeTrash(Request $request)
     {
-        // try {
+        try {
         DB::beginTransaction();
         GarbageSavingsData::create([
             'user_id' => Auth::user()->id,
@@ -72,10 +72,10 @@ class TrashController extends Controller
         ]);
         DB::commit();
         return $this->success('Success', 200);
-        // } catch (\Exception $e) {
-        //     DB::rollBack();
-        //     return $this->error("Failed", 401);
-        // }
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->error("Failed", 401);
+        }
     }
 
     public function storeIOT(Request $request)
@@ -203,7 +203,7 @@ class TrashController extends Controller
             return $this->error("Data Sampah ini bukan milik anda", 401);
         } else {
 
-            // try {
+            try {
             // calculate price
             $total_price = TrashController::calculatePrice($garbage_savings_data, $iot_data->weight);
             $admin_balance = $total_price * 40 / 100;
@@ -219,10 +219,10 @@ class TrashController extends Controller
 
             TrashController::createTransactionLog($user_balance, $garbage_savings_data->user_id, "STORE", $garbage_savings_data);
             return $this->success("Data IOT sudah terhubung", 200);
-            // } catch (\Exception $e) {
-            //     DB::rollBack();
-            //     return $this->error("Failed", 401);
-            // }
+            } catch (\Exception $e) {
+                DB::rollBack();
+                return $this->error("Failed", 401);
+            }
         }
     }
 
