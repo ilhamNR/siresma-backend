@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('garbage_savings_datas', function (Blueprint $table) {
-            $table->string('status')->after('price')->default("ON_PROCESS");
+            $table->string('status')->after('user_id')->default("ON_PROCESS");
          });
     }
 
