@@ -12,6 +12,7 @@ use App\Models\IOT;
 use Illuminate\Support\Facades\DB;
 use App\Models\TrashCategory;
 use App\Models\TransactionLog;
+use GrahamCampbell\ResultType\Success;
 
 use function PHPSTORM_META\map;
 
@@ -60,7 +61,7 @@ class TrashController extends Controller
     }
     public function storeTrash(Request $request)
     {
-        try {
+        // try {
         DB::beginTransaction();
         GarbageSavingsData::create([
             'user_id' => Auth::user()->id,
@@ -70,10 +71,10 @@ class TrashController extends Controller
         ]);
         DB::commit();
         return $this->success('Success', 200);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return $this->error("Failed", 401);
-        }
+        // } catch (\Exception $e) {
+        //     DB::rollBack();
+        //     return $this->error("Failed", 401);
+        // }
     }
 
     public function storeIOT(Request $request)
@@ -103,23 +104,32 @@ class TrashController extends Controller
     public function createTransactionLog($amount, $user_id, $type, $garbage_savings_data)
     {
         if ($type == "STORE") {
+            $last_store_code = TransactionLog::where('code', 'like', "STR".'%')->latest('code')->first();
+            $last_store_code_count = intval(substr($last_store_code->code, 3));
+            $new_store_data_code = 'STR' .str_pad($last_store_code_count + 1 , 4, '0', STR_PAD_LEFT);
             DB::beginTransaction();
             TransactionLog::create([
-                'code' => "STR0001",
+                'code' => $new_store_data_code,
                 'type' => "STORE",
                 'user_id' => $user_id,
                 'amount' => $amount,
-                'garbage_savings_data' => $garbage_savings_data
+                'garbage_savings_data_id' => $garbage_savings_data->id
 
             ]);
+            DB::commit();
         } else if ($type == "WITHDRAW") {
+            $last_withdraw_code = TransactionLog::where('code', 'like', "WDR".'%')->latest('code')->first();
+            $last_withdraw_code_count = intval(substr($last_withdraw_code->code, 3));
+            $new_withdraw_data_code = 'WDR' .str_pad($last_withdraw_code_count + 1 , 4, '0', STR_PAD_LEFT);
             DB::beginTransaction();
             TransactionLog::create([
-                'code' => "WDR0001",
+                'code' => $new_withdraw_data_code,
                 'type' => "WITHDRAW",
                 'user_id' => $user_id,
                 'amount' => $amount,
+                'garbage_savings_data_id' => $garbage_savings_data->id
             ]);
+            DB::commit();
         }
     }
     public function connectIOT(Request $request)
@@ -140,24 +150,26 @@ class TrashController extends Controller
             return $this->error("Data Sampah ini bukan milik anda", 401);
         } else {
 
-            try {
-                // calculate price
-                $total_price = TrashController::calculatePrice($garbage_savings_data, $iot_data->weight);
-                $admin_balance = $total_price*40/100;
-                $user_balance = $total_price*60/100;
+            // try {
+            // calculate price
+            $total_price = TrashController::calculatePrice($garbage_savings_data, $iot_data->weight);
+            $admin_balance = $total_price * 40 / 100;
+            $user_balance = $total_price * 60 / 100;
 
-                DB::beginTransaction();
-                $garbage_savings_data->update([
-                    'iot_id' =>  $iot_data->id,
-                    'user_balance' => $user_balance,
-                    'admin_balance' => $admin_balance
-                ]);
-                DB::commit();
-                return $this->success("Data IOT sudah terhubung", 200);
-            } catch (\Exception $e) {
-                DB::rollBack();
-                return $this->error("Failed", 401);
-            }
+            DB::beginTransaction();
+            $garbage_savings_data->update([
+                'iot_id' =>  $iot_data->id,
+                'user_balance' => $user_balance,
+                'admin_balance' => $admin_balance
+            ]);
+            DB::commit();
+
+            TrashController::createTransactionLog($user_balance, $garbage_savings_data->user_id, "STORE", $garbage_savings_data);
+            return $this->success("Data IOT sudah terhubung", 200);
+            // } catch (\Exception $e) {
+            //     DB::rollBack();
+            //     return $this->error("Failed", 401);
+            // }
         }
     }
 
