@@ -14,11 +14,9 @@ class LoginController extends Controller
 
     public function store(Request $request, $id = null)
     {
-        if(is_null(User::where('id', $request->user_id)->first())){
-            return $this->error("User tidak ditemukan", 401);
-        }if (isset(User::where('username', $request->username)->first()) && User::where('username', $request->username)->first()->is_verified == 0) {
-            $otpController = new OTPController(); // Instantiate an object of OTPController
-            $otpController->createOTP(User::where('username', $request->username)->first()->id);
+        if(is_null(User::where('username', $request->username)->first())){
+            return $this->error("Username tidak ditemukan", 401);
+        }else if (User::where('username', $request->username)->first()->is_verified == 0) {
             return $this->success("Akun belum terverifikasi, silahkan verikasi OTP",User::where('username', $request->username)->first()->id,401);
         } else if (Auth::attempt(['username' => $request->username, 'password' => $request->password])) {
             $user = User::where('username', $request->username)->firstOrFail();
