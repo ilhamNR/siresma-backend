@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('code'); 
             $table->string('type');
             $table->unsignedBigInteger('user_id')->index('transaction_logs_user_id_foreign');
-            $table->unsignedBigInteger('garbage_savings_data_id')->index('transaction_logs_garbage_savings_data_id_foreign');
+            $table->unsignedBigInteger('garbage_savings_data_id')->index('transaction_logs_garbage_savings_data_id_foreign')->nullable();
             $table->integer('amount');
             $table->integer('is_approved')->default(0);
             $table->timestamps();
