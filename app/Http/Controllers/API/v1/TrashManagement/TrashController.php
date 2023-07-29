@@ -167,14 +167,16 @@ class TrashController extends Controller
     {
         //get day count from last withdrawal
         $last_withdraw = TransactionLog::where('user_id', Auth::user()->id)->where('code', 'like', "WDR" . '%')->orderBy('created_at', 'desc')->first();
-        $last_withdraw_date = Carbon::parse($last_withdraw->created_at);
-        $todayDate = Carbon::today();
-        $last_withdraw_interval = $last_withdraw_date->diffInDays($todayDate);
-
         //get current balance
         $balance = TrashController::getBalance(Auth::user()->id);
-        if (30 > $last_withdraw_interval){
-            return $this->error("Permintaan tarik saldo anda terakhir masih kurang dari sebulan", 401);
+        if (isset($last_withdraw)) {
+            $last_withdraw_date = Carbon::parse($last_withdraw->created_at);
+            $todayDate = Carbon::today();
+            $last_withdraw_interval = $last_withdraw_date->diffInDays($todayDate);
+
+            if (30 > $last_withdraw_interval) {
+                return $this->error("Permintaan tarik saldo anda terakhir masih kurang dari sebulan", 401);
+            }
         }
         if ($balance >= $request->amount) {
             TrashController::createTransactionLog($request->amount, Auth::user()->id, "WITHDRAW", NULL);
@@ -256,8 +258,9 @@ class TrashController extends Controller
             return $this->error("Failed", 401);
         }
     }
-    public function getTransactionList(){
+    public function getTransactionList()
+    {
         $data = TransactionLog::where("user_id", Auth::user()->id)->get();
-        return $this->success("Success",$data, 200);
+        return $this->success("Success", $data, 200);
     }
 }
