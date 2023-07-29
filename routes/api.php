@@ -24,7 +24,7 @@ use App\Http\Controllers\API\v1\Auth\OTPController;
 Route::group(['prefix' => 'auth'], function () {
     Route::resource('login', LoginController::class);
     Route::resource('registration', RegisterController::class);
-    Route::post('/otp/create', [OTPController::class, 'createOTP']);
+    Route::post('/otp/create', [OTPController::class, 'createOTPExistingUser']);
     Route::post('verify', [OTPController::class, 'verifyAccount']);
 });
 

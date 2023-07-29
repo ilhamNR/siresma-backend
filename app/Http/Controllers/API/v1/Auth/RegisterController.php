@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Requests\RegisterRequest;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Controllers\API\v1\Auth\OTPController;
 
 class RegisterController extends Controller
 {
@@ -50,9 +51,11 @@ class RegisterController extends Controller
                     'profile_picture' => $fileName
                 ]);
                 DB::commit();
+                $otpController = new OTPController(); // Instantiate an object of OTPController
+                $otpController->createOTP($user->id);
             }
 
-            return $this->success("Success", null, 200);
+            return $this->success("Registrasi Sukses, Silahkan verifikasi OTP", null, 200);
         // } catch (\Exception $e) {
         //     return $this->error("Failed", 401);
         // }

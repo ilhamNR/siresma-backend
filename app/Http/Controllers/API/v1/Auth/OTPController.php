@@ -64,25 +64,35 @@ class OTPController extends Controller
         // dd($message_text);
     }
 
-    public function createOTP(Request $request)
+    public function createOTPExistingUser(Request $request)
     {
-        $user = User::findOrFail($request->user_id);
+        $user_id = $request->user_id;
+        $otpResult = OTPController::createOTP($user_id);
+        return($otpResult);
+    }
+    public function createOTP($user_id)
+    {
+        $user = User::findOrFail($user_id);
 
         //get existing OTP
-        $existingOTP = OTP::where('user_id', $request->user_id)->orderBy('created_at', 'desc')->first();
-        $otpCreationTime = Carbon::parse($existingOTP->created_at);
-        $now = Carbon::now();
-        $otpTimeDifference = $otpCreationTime->diffInSeconds($now);
-
+        $otpTimeDifference = 0;
+        $existingOTP = OTP::where('user_id', $user_id)->orderBy('created_at', 'desc')->first();
+        if(isset($existingOTP)){
+            $otpCreationTime = Carbon::parse($existingOTP->created_at);
+            $now = Carbon::now();
+            $otpTimeDifference = $otpCreationTime->diffInSeconds($now);
+            if ($otpTimeDifference < 120) {
+                return $this->error("Anda baru saja meminta OTP, ulangi lagi dalam " . 120 - $otpTimeDifference . " detik", 401);
+            }
+        }
         if ($user->is_verified == 1) {
             return $this->error("Akun anda telah aktif", 401);
-        } else if ($otpTimeDifference < 120) {
-            return $this->error("Anda baru saja meminta OTP, ulangi lagi dalam " . 120 - $otpTimeDifference . " detik", 401);
         }
         do {
             $code = sprintf("%06d", mt_rand(1, 999999));
             $existingCode = OTP::where('code', $code)->first();
         } while (isset($existingCode));
+        DB::beginTransaction();
         OTP::create([
             'code' => $code,
             'user_id' => $user->id,
@@ -90,6 +100,7 @@ class OTPController extends Controller
             'is_activated' => 0
         ]);
         OTPController::sendOTP($code, $user->phone);
+        DB::commit();
     }
 
     public function verifyAccount(Request $request)
