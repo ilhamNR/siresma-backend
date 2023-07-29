@@ -41,6 +41,11 @@ Route::group(['prefix' => 'trash', 'middleware' => ['auth:sanctum']], function (
     Route::post('/weight/update', [TrashController::class, 'updateWeight']);
 });
 
+Route::group(['prefix' => 'transaction', 'middleware' =>['auth:sanctum']], function(){
+    Route::post('withdraw', [TrashController::class, 'withdraw']);
+    Route::get('list', [TrashController::class, 'getTransactionList']);
+});
+
 Route::group(['prefix' => 'iot'], function () {
     Route::post('store', [TrashController::class, 'storeIOT']);
 });

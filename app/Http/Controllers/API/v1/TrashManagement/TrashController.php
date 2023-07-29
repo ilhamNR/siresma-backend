@@ -12,6 +12,7 @@ use App\Models\IOT;
 use Illuminate\Support\Facades\DB;
 use App\Models\TrashCategory;
 use App\Models\TransactionLog;
+use Carbon\Carbon;
 use GrahamCampbell\ResultType\Success;
 
 use function PHPSTORM_META\map;
@@ -104,9 +105,14 @@ class TrashController extends Controller
     public function createTransactionLog($amount, $user_id, $type, $garbage_savings_data)
     {
         if ($type == "STORE") {
-            $last_store_code = TransactionLog::where('code', 'like', "STR".'%')->latest('code')->first();
-            $last_store_code_count = intval(substr($last_store_code->code, 3));
-            $new_store_data_code = 'STR' .str_pad($last_store_code_count + 1 , 4, '0', STR_PAD_LEFT);
+            $last_store_code = TransactionLog::where('code', 'like', "STR" . '%')->latest('code')->first();
+            if (isset($last_store_code)) {
+                $last_store_code_count = intval(substr($last_store_code->code, 3));
+                $new_store_data_code = 'STR' . str_pad($last_store_code_count + 1, 4, '0', STR_PAD_LEFT);
+            } else {
+                $new_store_data_code = 'STR0001';
+            }
+            
             DB::beginTransaction();
             TransactionLog::create([
                 'code' => $new_store_data_code,
@@ -118,19 +124,64 @@ class TrashController extends Controller
             ]);
             DB::commit();
         } else if ($type == "WITHDRAW") {
-            $last_withdraw_code = TransactionLog::where('code', 'like', "WDR".'%')->latest('code')->first();
-            $last_withdraw_code_count = intval(substr($last_withdraw_code->code, 3));
-            $new_withdraw_data_code = 'WDR' .str_pad($last_withdraw_code_count + 1 , 4, '0', STR_PAD_LEFT);
+            $last_withdraw_code = TransactionLog::where('code', 'like', "WDR" . '%')->latest('code')->first();
+            if (isset($last_withdraw_code)) {
+                $last_withdraw_code_count = intval(substr($last_withdraw_code->code, 3));
+                $new_withdraw_data_code = 'WDR' . str_pad($last_withdraw_code_count + 1, 4, '0', STR_PAD_LEFT);
+            } else {
+                $new_withdraw_data_code = 'WDR0001';
+            }
             DB::beginTransaction();
             TransactionLog::create([
                 'code' => $new_withdraw_data_code,
                 'type' => "WITHDRAW",
                 'user_id' => $user_id,
                 'amount' => $amount,
-                'garbage_savings_data_id' => $garbage_savings_data->id
+                'garbage_savings_data_id' => NULL
             ]);
             DB::commit();
         }
+    }
+    public function getBalance($user_id)
+    {
+
+        //get total of stored balance
+        $store_data = TransactionLog::where('user_id', $user_id)->where('code', 'like', "STR" . '%')->get();
+        $stored_balance = 0;
+        foreach ($store_data as $storeLogs) {
+            $stored_balance += $storeLogs->amount;
+        }
+
+        //get total of withdrawed balance
+        $withdraw_data = TransactionLog::where('user_id', $user_id)->where('code', 'like', "WDR" . '%')->get();
+        $withdrawed_balance = 0;
+        foreach ($withdraw_data as $withdrawLogs) {
+            $withdrawed_balance += $withdrawLogs->amount;
+        }
+        $balance = $stored_balance - $withdrawed_balance;
+
+        return ($balance);
+    }
+
+    public function withdraw(Request $request)
+    {
+        //get day count from last withdrawal
+        $last_withdraw = TransactionLog::where('user_id', Auth::user()->id)->where('code', 'like', "WDR" . '%')->orderBy('created_at', 'desc')->first();
+        $last_withdraw_date = Carbon::parse($last_withdraw->created_at);
+        $todayDate = Carbon::today();
+        $last_withdraw_interval = $last_withdraw_date->diffInDays($todayDate);
+
+        //get current balance
+        $balance = TrashController::getBalance(Auth::user()->id);
+        if (30 > $last_withdraw_interval){
+            return $this->error("Permintaan tarik saldo anda terakhir masih kurang dari sebulan", 401);
+        }
+        if ($balance >= $request->amount) {
+            TrashController::createTransactionLog($request->amount, Auth::user()->id, "WITHDRAW", NULL);
+        } else {
+            return $this->error("Saldo Tidak Mencukupi", 401);
+        }
+        return $this->success("Permintaan Penarikan dana telah dibuat", 200);
     }
     public function connectIOT(Request $request)
     {
@@ -204,5 +255,9 @@ class TrashController extends Controller
             DB::rollBack();
             return $this->error("Failed", 401);
         }
+    }
+    public function getTransactionList(){
+        $data = TransactionLog::where("user_id", Auth::user()->id)->get();
+        return $this->success("Success",$data, 200);
     }
 }
