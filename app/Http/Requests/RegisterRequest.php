@@ -38,7 +38,7 @@ class RegisterRequest extends FormRequest
             : 'required|max:255',
             'address' => request()->route('auth/registration') ? 'required|max:255'. request()->route('auth/registration')
             : 'required|max:255',
-            'profile_picture' =>  request()->route('auth/registration') ? 'nullable'. request()->route('auth/registration') : File::image()->max(2048) ,
+            'profile_picture' =>  request()->route('auth/registration') ? 'nullable'. request()->route('auth/registration') : File::image()->max(5120) ,
         ];     
     }
 }
