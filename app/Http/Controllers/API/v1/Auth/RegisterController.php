@@ -19,7 +19,7 @@ class RegisterController extends Controller
 
     public function store(RegisterRequest $request)
     {
-        // try {
+        try {
            
             // dd($fileName);
             $user = $request->validated();
@@ -55,9 +55,9 @@ class RegisterController extends Controller
                 $otpController->createOTP($user->id);
             }
 
-            return $this->success("Registrasi Sukses, Silahkan verifikasi OTP", null, 200);
-        // } catch (\Exception $e) {
-        //     return $this->error("Failed", 401);
-        // }
+            return $this->success("Registrasi Sukses, Silahkan verifikasi OTP", $user->id, 200);
+        } catch (\Exception $e) {
+            return $this->error("Failed", 401);
+        }
     }
 }
