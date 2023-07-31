@@ -12,6 +12,7 @@ use App\Http\Requests\RegisterRequest;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\API\v1\Auth\OTPController;
+use Illuminate\Support\Str;
 
 class RegisterController extends Controller
 {
@@ -40,7 +41,7 @@ class RegisterController extends Controller
                 
                 DB::beginTransaction();
                 $user = User::create([
-                    'username' => $request->username,
+                    'username' => Str::lower($request->username),
                     'full_name' => $request->full_name,
                     'email' => $request->email,
                     'address' => $request->address,

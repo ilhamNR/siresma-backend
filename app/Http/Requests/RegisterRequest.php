@@ -26,16 +26,16 @@ class RegisterRequest extends FormRequest
     public function rules()
     {
         return [
-            'username' => request()->route('auth/registration') ? 'required|max:255'. request()->route('auth/registration')
-            : 'required|max:255',
+            'username' => request()->route('auth/registration') ? 'required|string|regex:/^\S*$/u|max:255|unique:users,username'. request()->route('auth/registration')
+            : 'required|string|regex:/^\S*$/u|max:255|unique:users,username',
             'full_name' => request()->route('auth/registration') ? 'required|max:255'. request()->route('auth/registration')
             : 'required|max:255',
-            'phone' => request()->route('auth/registration') ? 'required|max:255'. request()->route('auth/registration')
-            : 'required|max:255',
-            'no_kk' => request()->route('auth/registration') ? 'required|max:255'. request()->route('auth/registration')
-            : 'required|max:255',
+            'phone' => request()->route('auth/registration') ? 'required|min:10|max:13|unique:users,phone'. request()->route('auth/registration')
+            : 'required||min:10|max:13|unique:users,phone',
+            'no_kk' => request()->route('auth/registration') ? 'required|min:16|max:16|unique:users,no_kk'. request()->route('auth/registration')
+            : 'required|min:16|max:16|unique:users,no_kk',
             'password' => request()->route('auth/registration') ? 'required|max:255'. request()->route('auth/registration')
-            : 'required|max:255',
+            : 'required|max:255|min:8',
             'address' => request()->route('auth/registration') ? 'required|max:255'. request()->route('auth/registration')
             : 'required|max:255',
             'profile_picture' =>  request()->route('auth/registration') ? 'nullable'. request()->route('auth/registration') : File::image()->max(5120) ,
