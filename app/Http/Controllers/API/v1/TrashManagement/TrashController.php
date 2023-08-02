@@ -14,6 +14,7 @@ use App\Models\TrashCategory;
 use App\Models\TransactionLog;
 use Carbon\Carbon;
 use GrahamCampbell\ResultType\Success;
+use App\Models\User;
 
 use function PHPSTORM_META\map;
 
@@ -63,15 +64,15 @@ class TrashController extends Controller
     public function storeTrash(Request $request)
     {
         try {
-        DB::beginTransaction();
-        GarbageSavingsData::create([
-            'user_id' => Auth::user()->id,
-            'trash_bank_id' => $request->trash_bank_id,
-            'trash_category_id' => $request->trash_category_id,
-            'store_date' => $request->store_date
-        ]);
-        DB::commit();
-        return $this->success('Success', 200);
+            DB::beginTransaction();
+            GarbageSavingsData::create([
+                'user_id' => Auth::user()->id,
+                'trash_bank_id' => $request->trash_bank_id,
+                'trash_category_id' => $request->trash_category_id,
+                'store_date' => $request->store_date
+            ]);
+            DB::commit();
+            return $this->success('Success', 200);
         } catch (\Exception $e) {
             DB::rollBack();
             return $this->error("Failed", 401);
@@ -104,6 +105,7 @@ class TrashController extends Controller
 
     public function createTransactionLog($amount, $user_id, $type, $garbage_savings_data)
     {
+        $trash_bank_id = User::where('id', $user_id)->first()->trash_bank_id;
         if ($type == "STORE") {
             $last_store_code = TransactionLog::where('code', 'like', "STR" . '%')->latest('code')->first();
             if (isset($last_store_code)) {
@@ -112,17 +114,22 @@ class TrashController extends Controller
             } else {
                 $new_store_data_code = 'STR0001';
             }
-            
-            DB::beginTransaction();
-            TransactionLog::create([
-                'code' => $new_store_data_code,
-                'type' => "STORE",
-                'user_id' => $user_id,
-                'amount' => $amount,
-                'garbage_savings_data_id' => $garbage_savings_data->id
+            try {
+                DB::beginTransaction();
+                TransactionLog::create([
+                    'code' => $new_store_data_code,
+                    'type' => "STORE",
+                    'user_id' => $user_id,
+                    'amount' => $amount,
+                    'garbage_savings_data_id' => $garbage_savings_data->id,
+                    'trash_bank_id' => $trash_bank_id
 
-            ]);
-            DB::commit();
+                ]);
+                DB::commit();
+            } catch (\Exception $e) {
+                DB::rollBack();
+                return $this->error("Failed", 401);
+            }
         } else if ($type == "WITHDRAW") {
             $last_withdraw_code = TransactionLog::where('code', 'like', "WDR" . '%')->latest('code')->first();
             if (isset($last_withdraw_code)) {
@@ -131,15 +138,21 @@ class TrashController extends Controller
             } else {
                 $new_withdraw_data_code = 'WDR0001';
             }
-            DB::beginTransaction();
-            TransactionLog::create([
-                'code' => $new_withdraw_data_code,
-                'type' => "WITHDRAW",
-                'user_id' => $user_id,
-                'amount' => $amount,
-                'garbage_savings_data_id' => NULL
-            ]);
-            DB::commit();
+            try {
+                DB::beginTransaction();
+                TransactionLog::create([
+                    'code' => $new_withdraw_data_code,
+                    'type' => "WITHDRAW",
+                    'user_id' => $user_id,
+                    'amount' => $amount,
+                    'garbage_savings_data_id' => NULL,
+                    'trash_bank_id' =>  $trash_bank_id
+                ]);
+                DB::commit();
+            } catch (\Exception $e) {
+                DB::rollBack();
+                return $this->error("Failed", 401);
+            }
         }
     }
     public function getBalance($user_id)
@@ -201,24 +214,26 @@ class TrashController extends Controller
             return $this->error("Data stor sampah tidak valid", 401);
         } else if ($garbage_savings_data->user_id != Auth::user()->id) {
             return $this->error("Data Sampah ini bukan milik anda", 401);
+        } else if (is_null(TrashCategory::findOrFail($garbage_savings_data->trash_category_id))) {
+            return $this->error("Kategori sampah tidak valid", 401);
         } else {
 
             try {
-            // calculate price
-            $total_price = TrashController::calculatePrice($garbage_savings_data, $iot_data->weight);
-            $admin_balance = $total_price * 40 / 100;
-            $user_balance = $total_price * 60 / 100;
+                // calculate price
+                $total_price = TrashController::calculatePrice($garbage_savings_data, $iot_data->weight);
+                $admin_balance = $total_price * 40 / 100;
+                $user_balance = $total_price * 60 / 100;
 
-            DB::beginTransaction();
-            $garbage_savings_data->update([
-                'iot_id' =>  $iot_data->id,
-                'user_balance' => $user_balance,
-                'admin_balance' => $admin_balance
-            ]);
-            DB::commit();
+                DB::beginTransaction();
+                $garbage_savings_data->update([
+                    'iot_id' =>  $iot_data->id,
+                    'user_balance' => $user_balance,
+                    'admin_balance' => $admin_balance
+                ]);
+                DB::commit();
 
-            TrashController::createTransactionLog($user_balance, $garbage_savings_data->user_id, "STORE", $garbage_savings_data);
-            return $this->success("Data IOT sudah terhubung", 200);
+                TrashController::createTransactionLog($user_balance, $garbage_savings_data->user_id, "STORE", $garbage_savings_data);
+                return $this->success("Data IOT sudah terhubung", 200);
             } catch (\Exception $e) {
                 DB::rollBack();
                 return $this->error("Failed", 401);
