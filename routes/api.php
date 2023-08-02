@@ -9,6 +9,7 @@ use App\Http\Controllers\API\v1\TrashManagement\TrashBankController;
 use App\Http\Controllers\API\v1\TrashManagement\TrashController;
 use App\Http\Controllers\API\v1\Auth\LogoutController;
 use App\Http\Controllers\API\v1\Auth\OTPController;
+use App\Http\Controllers\API\v1\Admin\NasabahController;
 
 /*
 |--------------------------------------------------------------------------
@@ -59,4 +60,13 @@ Route::group(['prefix' => 'iot', 'middleware' => ['auth:sanctum']], function () 
 
 Route::group(['prefix' => 'auth', 'middleware' => ['auth:sanctum']], function() {
     Route::get('logout', [LogoutController::class, 'logout']);
+});
+
+Route::group(['prefix' => 'admin', 'middleware' => ['auth:sanctum']], function() {
+    Route::get('nasabah', [NasabahController::class, 'getAllUsers']);
+    Route::get('/nasabah/details', [NasabahController::class, 'getNasabahDetails']);
+    Route::get('/nasabah/details/transactions', [NasabahController::class, 'getTransactionDetails']);
+    Route::get('transactions/incoming', [NasabahController::class, 'getIncomingTransactions']);
+    Route::get('transactions/outcoming', [NasabahController::class, 'getOutcomingTransactions']);
+    Route::post('/nasabah/details/transactions/approve', [NasabahController::class, 'approveWithdrawal']);
 });
