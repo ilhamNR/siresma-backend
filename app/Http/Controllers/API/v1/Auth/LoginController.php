@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API\v1\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\TrashBank;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Traits\APIResponseTrait;
@@ -22,6 +23,11 @@ class LoginController extends Controller
             return $this->success("Akun belum terverifikasi, silahkan verikasi OTP",User::where('username', $request->username)->first()->id,401);
         } else if (Auth::attempt(['username' => $request->username, 'password' => $request->password])) {
             $user = User::where('username', $request->username)->firstOrFail();
+            if (isset($user->trash_bank_id)){
+                $location = TrashBank::findOrfail($user->trash_bank_id);
+            } else{
+                $location = NULL;
+            }
             $token = $user->createToken("SIRESMA")->plainTextToken;
             if ($user->profile_picture == ("" or NULL)) {
                 $profile_picture = asset('NULLpp.png');
@@ -33,6 +39,7 @@ class LoginController extends Controller
                 "full_name" => $user->full_name,
                 "role" => $user->role,
                 "phone" => $user->phone,
+                "location" => $location->name,
                 "address" => $user->address,
                 "no_kk" => $user->no_kk,
                 "profile_picture" => $profile_picture
