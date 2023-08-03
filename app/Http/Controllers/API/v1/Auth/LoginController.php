@@ -31,6 +31,7 @@ class LoginController extends Controller
             $data = array(
                 "id" => $user->id,
                 "full_name" => $user->full_name,
+                "role" => $user->role,
                 "phone" => $user->phone,
                 "address" => $user->address,
                 "no_kk" => $user->no_kk,
