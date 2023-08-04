@@ -24,42 +24,50 @@ class TrashController extends Controller
 
     public function list()
     {
-        $user = Auth::user()->id;
-        $data = GarbageSavingsData::where('user_id', $user)->with('trashCategory')->with('iot')->get();
-        $data = $data->map(function ($item) {
-            // hide iot id
-            unset($item->iot_id);
+        try {
+            $user = Auth::user()->id;
+            $data = GarbageSavingsData::where('user_id', $user)->with('trashCategory')->with('iot')->get();
+            $data = $data->map(function ($item) {
+                // hide iot id
+                unset($item->iot_id);
 
-            // hide iot timestamp
-            if (isset($item->iot)) {
-                unset($item->iot->created_at);
-                unset($item->iot->updated_at);
-            }
-
-
-            //hide trash category_id
-            unset($item->trash_category_id);
-
-            // hide trash category timestamp
-            if (isset($item->trashCategory)) {
-                unset($item->trashCategory->created_at);
-                unset($item->trashCategory->updated_at);
-            }
+                // hide iot timestamp
+                if (isset($item->iot)) {
+                    unset($item->iot->created_at);
+                    unset($item->iot->updated_at);
+                }
 
 
-            return $item;
-        });
-        return $this->success('Success', $data, 200);
+                //hide trash category_id
+                unset($item->trash_category_id);
+
+                // hide trash category timestamp
+                if (isset($item->trashCategory)) {
+                    unset($item->trashCategory->created_at);
+                    unset($item->trashCategory->updated_at);
+                }
+
+
+                return $item;
+            });
+            return $this->success('Success', $data, 200);
+        } catch (\Exception $e) {
+            return $this->error("Failed", 401);
+        }
     }
 
     public function generateCode()
     {
-        do {
-            $code = Str::random(7);
-            $generatedCode = Str::upper($code);
-            $existingCode = IOT::where('code', $generatedCode)->first();
-        } while (isset($existingCode));
-        return $generatedCode;
+        try {
+            do {
+                $code = Str::random(7);
+                $generatedCode = Str::upper($code);
+                $existingCode = IOT::where('code', $generatedCode)->first();
+            } while (isset($existingCode));
+            return $generatedCode;
+        } catch (\Exception $e) {
+            return $this->error("Failed", 401);
+        }
     }
     public function storeTrash(Request $request)
     {
@@ -157,23 +165,26 @@ class TrashController extends Controller
     }
     public function getBalance($user_id)
     {
+        try {
+            //get total of stored balance
+            $store_data = TransactionLog::where('user_id', $user_id)->where('code', 'like', "STR" . '%')->get();
+            $stored_balance = 0;
+            foreach ($store_data as $storeLogs) {
+                $stored_balance += $storeLogs->amount;
+            }
 
-        //get total of stored balance
-        $store_data = TransactionLog::where('user_id', $user_id)->where('code', 'like', "STR" . '%')->get();
-        $stored_balance = 0;
-        foreach ($store_data as $storeLogs) {
-            $stored_balance += $storeLogs->amount;
+            //get total of withdrawed balance
+            $withdraw_data = TransactionLog::where('user_id', $user_id)->where('code', 'like', "WDR" . '%')->get();
+            $withdrawed_balance = 0;
+            foreach ($withdraw_data as $withdrawLogs) {
+                $withdrawed_balance += $withdrawLogs->amount;
+            }
+            $balance = $stored_balance - $withdrawed_balance;
+
+            return ($balance);
+        } catch (\Exception $e) {
+            return $this->error("Failed", 401);
         }
-
-        //get total of withdrawed balance
-        $withdraw_data = TransactionLog::where('user_id', $user_id)->where('code', 'like', "WDR" . '%')->get();
-        $withdrawed_balance = 0;
-        foreach ($withdraw_data as $withdrawLogs) {
-            $withdrawed_balance += $withdrawLogs->amount;
-        }
-        $balance = $stored_balance - $withdrawed_balance;
-
-        return ($balance);
     }
 
     public function withdraw(Request $request)
@@ -269,13 +280,16 @@ class TrashController extends Controller
 
             return $this->success($data, 200);
         } catch (\Exception $e) {
-            DB::rollBack();
             return $this->error("Failed", 401);
         }
     }
     public function getTransactionList()
     {
-        $data = TransactionLog::where("user_id", Auth::user()->id)->get();
-        return $this->success("Success", $data, 200);
+        try {
+            $data = TransactionLog::where("user_id", Auth::user()->id)->get();
+            return $this->success("Success", $data, 200);
+        } catch (\Exception $e) {
+            return $this->error("Failed", 401);
+        }
     }
 }

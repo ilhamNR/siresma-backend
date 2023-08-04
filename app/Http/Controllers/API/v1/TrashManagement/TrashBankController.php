@@ -25,15 +25,15 @@ class TrashBankController extends Controller
 
     public function chooseBankSampah(Request $request)
     {
-        try{
-        $user = User::findOrFail(Auth::user()->id);
-        // dd($user);
-        $user->update([
-            'trash_bank_id' => $request->trash_bank_id
-        ]);
-        return $this->success("Success", null, 200);
-    } catch(\Exception $e) {
-        return $this->error("Failed", 401);
-    }
+        try {
+            $user = User::findOrFail(Auth::user()->id);
+            // dd($user);
+            $user->update([
+                'trash_bank_id' => $request->trash_bank_id
+            ]);
+            return $this->success("Success", null, 200);
+        } catch (\Exception $e) {
+            return $this->error("Failed", 401);
+        }
     }
 }

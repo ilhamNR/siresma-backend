@@ -131,7 +131,7 @@ class OTPController extends Controller
             return $this->error("OTP telah kadaluarsa, silahkan meminta OTP kembali", 401);
         } else if ($otp->is_activated == 1) {
             return $this->error("OTP Telah Digunakan", 401);
-        } else {
+        } else if ($otp->user_id === $request->user_id) {
             try {
                 DB::beginTransaction();
                 $otp->update([
@@ -145,6 +145,8 @@ class OTPController extends Controller
             } catch (\Exception $e) {
                 return $this->error("Failed", 401);
             }
+        } else{
+            return $this->error("Failed", 401);
         }
     }
 }
