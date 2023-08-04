@@ -68,7 +68,7 @@ class OTPController extends Controller
     {
         $user_id = $request->user_id;
         $otpResult = OTPController::createOTP($user_id);
-        return($otpResult);
+        return ($otpResult);
     }
     public function createOTP($user_id)
     {
@@ -77,7 +77,7 @@ class OTPController extends Controller
         //get existing OTP
         $otpTimeDifference = 0;
         $existingOTP = OTP::where('user_id', $user_id)->orderBy('created_at', 'desc')->first();
-        if(isset($existingOTP)){
+        if (isset($existingOTP)) {
             $otpCreationTime = Carbon::parse($existingOTP->created_at);
             $now = Carbon::now();
             $otpTimeDifference = $otpCreationTime->diffInSeconds($now);
@@ -107,7 +107,7 @@ class OTPController extends Controller
     {
 
         $otp = OTP::where('code', $request->otp_code)->first();
-        $user = User::findOrFail($request->user_id)->first();
+        $user = User::where('id', $request->user_id)->first();
         $otpTimeDifference = 0;
         if (isset($otp)) {
             $otpCreationTime = Carbon::parse($otp->created_at);

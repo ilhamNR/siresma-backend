@@ -28,7 +28,7 @@ class User extends Authenticatable
     /**
      * @var array
      */
-    protected $fillable = ['trash_bank_id', 'username','profile_picture', 'full_name', 'email','address','is_verified', 'no_kk', 'phone', 'password', 'created_at', 'updated_at'];
+    protected $fillable = ['trash_bank_id', 'username', 'profile_picture', 'full_name', 'email', 'address', 'is_verified', "role", 'no_kk', 'phone', 'password', 'created_at', 'updated_at'];
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
@@ -56,4 +56,35 @@ class User extends Authenticatable
     protected $hidden = [
         'password'
     ];
+    public function authorizeRoles($roles)
+    {
+      if ($this->hasAnyRole($roles)) {
+        return true;
+      }
+      abort(401, 'This action is unauthorized.');
+    }
+
+    public function hasAnyRole($roles)
+    {
+      if (is_array($roles)) {
+        foreach ($roles as $role) {
+          if ($this->hasRole($role)) {
+            return true;
+          }
+        }
+      } else {
+        if ($this->hasRole($roles)) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    public function hasRole($role)
+    {
+      if ($this->role == $role) {
+        return true;
+      }
+      return false;
+    }
 }
