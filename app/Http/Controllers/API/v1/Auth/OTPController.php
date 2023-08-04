@@ -92,15 +92,20 @@ class OTPController extends Controller
             $code = sprintf("%06d", mt_rand(1, 999999));
             $existingCode = OTP::where('code', $code)->first();
         } while (isset($existingCode));
-        DB::beginTransaction();
-        OTP::create([
-            'code' => $code,
-            'user_id' => $user->id,
-            'number' => $user->phone,
-            'is_activated' => 0
-        ]);
-        OTPController::sendOTP($code, $user->phone);
-        DB::commit();
+        try {
+            DB::beginTransaction();
+            OTP::create([
+                'code' => $code,
+                'user_id' => $user->id,
+                'number' => $user->phone,
+                'is_activated' => 0
+            ]);
+            OTPController::sendOTP($code, $user->phone);
+            DB::commit();
+            return $this->success("OTP berhasil terkirim", 200);
+        } catch (\Exception $e) {
+            return $this->error("Failed", 401);
+        }
     }
 
     public function verifyAccount(Request $request)
@@ -127,14 +132,19 @@ class OTPController extends Controller
         } else if ($otp->is_activated == 1) {
             return $this->error("OTP Telah Digunakan", 401);
         } else {
-            DB::beginTransaction();
-            $otp->update([
-                "is_activated" => 1
-            ]);
-            $user->update([
-                "is_verified" => 1
-            ]);
-            DB::commit();
+            try {
+                DB::beginTransaction();
+                $otp->update([
+                    "is_activated" => 1
+                ]);
+                $user->update([
+                    "is_verified" => 1
+                ]);
+                DB::commit();
+                return $this->success("User berhasil terverifikasi", 200);
+            } catch (\Exception $e) {
+                return $this->error("Failed", 401);
+            }
         }
     }
 }
