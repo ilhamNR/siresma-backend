@@ -25,9 +25,9 @@ class LoginController extends Controller
             } else if (Auth::attempt(['username' => $request->username, 'password' => $request->password])) {
                 $user = User::where('username', $request->username)->firstOrFail();
                 if (isset($user->trash_bank_id)) {
-                    $location = TrashBank::findOrfail($user->trash_bank_id);
+                    $location = TrashBank::findOrfail($user->trash_bank_id)->name;
                 } else {
-                    $location = NULL;
+                    $location = "";
                 }
                 $token = $user->createToken("SIRESMA")->plainTextToken;
                 if ($user->profile_picture == ("" or NULL)) {
@@ -40,7 +40,7 @@ class LoginController extends Controller
                     "full_name" => $user->full_name,
                     "role" => $user->role,
                     "phone" => $user->phone,
-                    "location" => $location->name,
+                    "location" => $location,
                     "address" => $user->address,
                     "no_kk" => $user->no_kk,
                     "profile_picture" => $profile_picture
