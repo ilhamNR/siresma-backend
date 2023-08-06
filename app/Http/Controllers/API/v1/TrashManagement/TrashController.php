@@ -225,7 +225,7 @@ class TrashController extends Controller
             return $this->error("Data stor sampah tidak valid", 401);
         } else if ($garbage_savings_data->user_id != Auth::user()->id) {
             return $this->error("Data Sampah ini bukan milik anda", 401);
-        } else if (is_null(TrashCategory::findOrFail($garbage_savings_data->trash_category_id))) {
+        } else if (is_null(TrashCategory::where('id', $garbage_savings_data->trash_category_id)->first())) {
             return $this->error("Kategori sampah tidak valid", 401);
         } else {
 
