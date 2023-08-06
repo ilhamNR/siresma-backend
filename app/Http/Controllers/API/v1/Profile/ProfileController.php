@@ -10,11 +10,15 @@ use App\Models\User;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
 use App\Models\TrashBank;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
+use App\Http\Requests\UpdateProfileRequest;
 
 class ProfileController extends Controller
 {
     use APIResponseTrait;
-    public function details(){
+    public function details()
+    {
         $user = User::findOrfail(Auth::user()->id);
         if (isset($user->trash_bank_id)) {
             $location = TrashBank::findOrfail($user->trash_bank_id)->name;
@@ -39,17 +43,34 @@ class ProfileController extends Controller
         return $this->success("Success", $data, 200);
     }
 
-    public function updateProfile(Request $request){
+    public function updateProfile(UpdateProfileRequest $request)
+    {
+        if (isset($request->profile_picture)) {
+            $fileName = $request->profile_picture->hashName();
+            $files = Storage::disk('public')->put('profile_picture/', $request->profile_picture);
+        }
         $user = User::findOrfail(Auth::user()->id);
-        dd($user->profile_picture);
-        $user->update([
-            // 'username' => Str::lower($request->username),
-            'full_name' => $request->full_name,
-            // 'email' => $request->email,
-            'address' => $request->address,
-            // 'no_kk' => $request->no_kk,
-            'phone' => $request->phone,
-            // 'profile_picture' => $fileName
-        ]);
+        // dd($user->profile_picture);
+        try {
+            DB::beginTransaction();
+            $user->update([
+                // 'username' => Str::lower($request->username),
+                'full_name' => $request->full_name ?? $user->full_name,
+                // 'email' => $request->email,
+                'address' => $request->address ?? $user->full_name,
+                // 'no_kk' => $request->no_kk,
+                'phone' => $request->phone ?? $user->full_name,
+                // 'profile_picture' => $fileName
+            ]);
+            if (isset($request->profile_picture)) {
+                $user->update([
+                    'profile_picture' => $fileName
+                ]);
+            }
+            DB::commit();
+            return $this->success("Profile berhasil diubah", 200);
+        } catch (\Exception $e) {
+            return $this->error("Failed", 401);
+        }
     }
 }
