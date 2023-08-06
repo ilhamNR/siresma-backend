@@ -10,6 +10,7 @@ use App\Http\Controllers\API\v1\TrashManagement\TrashController;
 use App\Http\Controllers\API\v1\Auth\LogoutController;
 use App\Http\Controllers\API\v1\Auth\OTPController;
 use App\Http\Controllers\API\v1\Admin\NasabahController;
+use App\Http\Controllers\API\v1\Profile\ProfileController;
 
 /*
 |--------------------------------------------------------------------------
@@ -27,6 +28,13 @@ Route::group(['prefix' => 'auth'], function () {
     Route::resource('registration', RegisterController::class);
     Route::post('/otp/create', [OTPController::class, 'createOTPExistingUser']);
     Route::post('verify', [OTPController::class, 'verifyAccount']);
+});
+
+Route::group(['prefix' => 'myprofile', 'middleware' => ['auth:sanctum']], function () {
+    Route::get('details', [ProfileController::class, 'details']);
+    Route::post('update', [ProfileController::class, 'updateProfile']);
+    Route::post('/update/password', [TrashController::class, 'connectIOT']);
+
 });
 
 Route::group(['prefix' => 'home', 'middleware' => ['auth:sanctum']], function () {
