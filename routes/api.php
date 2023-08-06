@@ -79,4 +79,5 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth:sanctum']], function()
     Route::get('transactions/incoming', [NasabahController::class, 'getIncomingTransactions']);
     Route::get('transactions/outcoming', [NasabahController::class, 'getOutcomingTransactions']);
     Route::post('/nasabah/details/transactions/approve', [NasabahController::class, 'approveWithdrawal']);
+    Route::post('/nasabah/details/trash_store/complete', [NasabahController::class, 'completeTrashStore']);
 });

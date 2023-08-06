@@ -170,11 +170,11 @@ class NasabahController extends Controller
                     return $item;
                 }
             );
-            $data = $data->toArray();
+            // $data = $data->toArray();
             return $this->success("Success", $data, 200);
-        } catch (\Exception $e) {
-            return $this->error("Failed", 401);
-        }
+            } catch (\Exception $e) {
+                return $this->error("Failed", 401);
+            }
     }
     public function approveWithdrawal(Request $request)
     {
@@ -194,6 +194,33 @@ class NasabahController extends Controller
                 ]);
                 DB::commit();
                 return $this->success("Pencairan telah disetujui", 200);
+            } catch (\Exception $e) {
+                DB::rollBack();
+                return $this->error("Failed", 401);
+            }
+        }
+    }
+    public function completeTrashStore(Request $request){
+       
+        $garbage_savings_data = GarbageSavingsData::findOrFail($request->garbage_savings_id);
+        // $applicant = User::findOrFail($transaction->user_id);
+        $pengelola_location = Auth::user()->trash_bank_id;
+        // dd($garbage_savings_data);
+
+        if ($garbage_savings_data->trash_bank_id != $pengelola_location) {
+            return $this->error("Lokasi bank sampah anda dan pengajuan tidak sesuai", 401);
+        } else if(is_null($garbage_savings_data->iot_id)){
+            return $this->error("Data store sampah ini belum ditimbang", 401);
+        } if ($garbage_savings_data->status === "DONE") {
+            return $this->error("Data ini sebelumnya telah diselesaikan", 401);
+        } else {
+            try {
+                DB::beginTransaction();
+                $garbage_savings_data->update([
+                    'status' => "DONE"
+                ]);
+                DB::commit();
+                return $this->success("Proses store sampah berhasil diselesaikan", 200);
             } catch (\Exception $e) {
                 DB::rollBack();
                 return $this->error("Failed", 401);
