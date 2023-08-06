@@ -72,7 +72,7 @@ Route::group(['prefix' => 'auth', 'middleware' => ['auth:sanctum']], function() 
     Route::get('logout', [LogoutController::class, 'logout']);
 });
 
-Route::group(['prefix' => 'admin', 'middleware' => ['auth:sanctum']], function() {
+Route::group(['prefix' => 'admin', 'middleware' => ['auth:sanctum','role:pengelola']], function() {
     Route::get('nasabah', [NasabahController::class, 'getAllUsers']);
     Route::get('/nasabah/details', [NasabahController::class, 'getNasabahDetails']);
     Route::get('/nasabah/details/transactions', [NasabahController::class, 'getTransactionDetails']);
