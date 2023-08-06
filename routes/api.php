@@ -11,6 +11,7 @@ use App\Http\Controllers\API\v1\Auth\LogoutController;
 use App\Http\Controllers\API\v1\Auth\OTPController;
 use App\Http\Controllers\API\v1\Admin\NasabahController;
 use App\Http\Controllers\API\v1\Profile\ProfileController;
+use Symfony\Component\HttpKernel\Profiler\Profile;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,7 +34,7 @@ Route::group(['prefix' => 'auth'], function () {
 Route::group(['prefix' => 'myprofile', 'middleware' => ['auth:sanctum']], function () {
     Route::get('details', [ProfileController::class, 'details']);
     Route::post('update', [ProfileController::class, 'updateProfile']);
-    Route::post('/update/password', [TrashController::class, 'connectIOT']);
+    Route::post('/update/password', [ProfileController::class, 'updatePassword']);
 
 });
 

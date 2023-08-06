@@ -13,6 +13,7 @@ use App\Models\TrashBank;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use App\Http\Requests\UpdateProfileRequest;
+use App\Http\Requests\UpdatePasswordRequest;
 
 class ProfileController extends Controller
 {
@@ -70,7 +71,26 @@ class ProfileController extends Controller
             DB::commit();
             return $this->success("Profile berhasil diubah", 200);
         } catch (\Exception $e) {
+            DB::rollBack();
             return $this->error("Failed", 401);
+        }
+    }
+
+    public function updatePassword(UpdatePasswordRequest $request)
+    {
+        $user = User::findOrfail(Auth::user()->id);
+        if (isset($request->new_password)) {
+            try {
+                DB::beginTransaction();
+                $user->update([
+                    'password' => Hash::make($request->new_password)
+                ]);
+                DB::commit();
+                return $this->success("Password berhasil dirubah", 200);
+            } catch (\Exception $e) {
+                DB::rollBack();
+                return $this->error("Failed", 401);
+            }
         }
     }
 }
