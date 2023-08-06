@@ -172,17 +172,18 @@ class NasabahController extends Controller
             );
             // $data = $data->toArray();
             return $this->success("Success", $data, 200);
-            } catch (\Exception $e) {
-                return $this->error("Failed", 401);
-            }
+        } catch (\Exception $e) {
+            return $this->error("Failed", 401);
+        }
     }
     public function approveWithdrawal(Request $request)
     {
-        $transaction = TransactionLog::findOrFail($request->transaction_id);
+        $transaction = TransactionLog::where('id', $request->transaction_id)->first();
         // $applicant = User::findOrFail($transaction->user_id);
         $pengelola_location = Auth::user()->trash_bank_id;
-
-        if ($transaction->trash_bank_id != $pengelola_location) {
+        if (is_null($transaction)) {
+            return $this->error("Data tidak ditemukan", 401);
+        } else if ($transaction->trash_bank_id != $pengelola_location) {
             return $this->error("Lokasi bank sampah anda dan pengajuan tidak sesuai", 401);
         } else if ($transaction->is_approved === 1) {
             return $this->error("Data ini sebelumnya telah disetujui", 401);
@@ -200,18 +201,22 @@ class NasabahController extends Controller
             }
         }
     }
-    public function completeTrashStore(Request $request){
-       
-        $garbage_savings_data = GarbageSavingsData::findOrFail($request->garbage_savings_id);
+    public function completeTrashStore(Request $request)
+    {
+        
+
+        $garbage_savings_data = GarbageSavingsData::where('id', $request->garbage_savings_id)->first();
         // $applicant = User::findOrFail($transaction->user_id);
         $pengelola_location = Auth::user()->trash_bank_id;
         // dd($garbage_savings_data);
-
-        if ($garbage_savings_data->trash_bank_id != $pengelola_location) {
+        if(is_null($garbage_savings_data)){
+            return $this->error("Data tidak ditemukan", 401);
+        } else if ($garbage_savings_data->trash_bank_id != $pengelola_location) {
             return $this->error("Lokasi bank sampah anda dan pengajuan tidak sesuai", 401);
-        } else if(is_null($garbage_savings_data->iot_id)){
+        } else if (is_null($garbage_savings_data->iot_id)) {
             return $this->error("Data store sampah ini belum ditimbang", 401);
-        } if ($garbage_savings_data->status === "DONE") {
+        }
+        if ($garbage_savings_data->status === "DONE") {
             return $this->error("Data ini sebelumnya telah diselesaikan", 401);
         } else {
             try {
