@@ -27,6 +27,7 @@ use Symfony\Component\HttpKernel\Profiler\Profile;
 Route::group(['prefix' => 'auth'], function () {
     Route::resource('login', LoginController::class);
     Route::resource('registration', RegisterController::class);
+    Route::post('registration/change_number', [RegisterController::class, 'changeNumber']);
     Route::post('/otp/create', [OTPController::class, 'createOTPExistingUser']);
     Route::post('verify', [OTPController::class, 'verifyAccount']);
 });
