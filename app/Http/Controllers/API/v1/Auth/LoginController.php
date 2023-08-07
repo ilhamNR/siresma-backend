@@ -45,7 +45,7 @@ class LoginController extends Controller
                     "no_kk" => $user->no_kk,
                     "profile_picture" => $profile_picture
                 );
-                return $this->success("Success", $data, 200, $token);
+                return $this->success("Sukses melakukan login", $data, 200, $token);
             } else {
                 return $this->error("Username atau password kamu salah", 401);
             }

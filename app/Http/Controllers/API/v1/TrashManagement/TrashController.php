@@ -287,7 +287,7 @@ class TrashController extends Controller
     {
         try {
             $data = TransactionLog::where("user_id", Auth::user()->id)->get();
-            return $this->success("Success", $data, 200);
+            return $this->success("Sukses mendapatkan data transaksi", $data, 200);
         } catch (\Exception $e) {
             return $this->error("Failed", 401);
         }

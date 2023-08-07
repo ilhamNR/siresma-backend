@@ -17,7 +17,7 @@ class TrashBankController extends Controller
     {
         try {
             $trashBank = TrashBank::all();
-            return $this->success("Success", $trashBank, 200);
+            return $this->success("Sukses mendapatkan daftar bank sampah", $trashBank, 200);
         } catch (\Exception $e) {
             return $this->error("Failed", 401);
         }
@@ -39,7 +39,7 @@ class TrashBankController extends Controller
                 return $this->error("Failed", 401);
             }
             $trashBank = TrashBank::findOrFail($user->trash_bank_id);
-            return $this->success("Success", $trashBank->id, 200);
+            return $this->success("Sukses memilih bank sampah", $trashBank->id, 200);
         }
     }
 }
