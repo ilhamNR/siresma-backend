@@ -39,7 +39,7 @@ class TrashBankController extends Controller
                 return $this->error("Failed", 401);
             }
             $trashBank = TrashBank::findOrFail($user->trash_bank_id);
-            return $this->success("Success", $trashBank, 200);
+            return $this->success("Success", $trashBank->id, 200);
         }
     }
 }
