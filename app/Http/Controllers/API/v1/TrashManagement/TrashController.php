@@ -260,7 +260,8 @@ class TrashController extends Controller
                 $garbage_savings_data->update([
                     'iot_id' =>  $iot_data->id,
                     'user_balance' => $user_balance,
-                    'admin_balance' => $admin_balance
+                    'admin_balance' => $admin_balance,
+                    'status' => "DONE"
                 ]);
                 DB::commit();
 
