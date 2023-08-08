@@ -24,7 +24,7 @@ class TrashController extends Controller
 
     public function list()
     {
-        try {
+        // try {
             $user = Auth::user()->id;
             $data = GarbageSavingsData::where('user_id', $user)->with('trashCategory')->with('iot')->get();
             $data = $data->map(function ($item) {
@@ -32,28 +32,35 @@ class TrashController extends Controller
                 unset($item->iot_id);
 
                 // hide iot timestamp
-                if (isset($item->iot)) {
+                if (isset($item->iot))
+                {
+                    $item->weight = $item->iot->weight;
                     unset($item->iot->created_at);
-                    unset($item->iot->updated_at);
+                    unset($item->iot);
                 }
-
-
                 //hide trash category_id
                 unset($item->trash_category_id);
 
                 // hide trash category timestamp
                 if (isset($item->trashCategory)) {
-                    unset($item->trashCategory->created_at);
-                    unset($item->trashCategory->updated_at);
+                    $item->trash_category = $item->trashCategory->category_name;
+                    unset($item->trashCategory);
                 }
 
+                if ($item->status == "ON_PROCESS"){
+                    $item->status = "Masih dalam Proses";
+                } else if ($item->status == "DONE"){
+                    $item->status = "Selesai";
+                } else
+                unset($item->iot);
+                unset($item->trashCategory);
 
                 return $item;
             });
             return $this->success('Success', $data, 200);
-        } catch (\Exception $e) {
-            return $this->error("Failed", 401);
-        }
+        // } catch (\Exception $e) {
+        //     return $this->error("Failed", 401);
+        // }
     }
 
     public function generateCode()
@@ -71,20 +78,36 @@ class TrashController extends Controller
     }
     public function storeTrash(Request $request)
     {
-        try {
+        // try {
             DB::beginTransaction();
-            GarbageSavingsData::create([
+            $data = GarbageSavingsData::create([
                 'user_id' => Auth::user()->id,
                 'trash_bank_id' => $request->trash_bank_id,
                 'trash_category_id' => $request->trash_category_id,
                 'store_date' => $request->store_date
             ]);
             DB::commit();
-            return $this->success('Success', 200);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return $this->error("Failed", 401);
-        }
+            $dataShow = GarbageSavingsData::where('id',$data->id)->get();
+            $dataShow = $dataShow->map(function ($item) {
+                // hide unshown column
+                unset($item->user_id);
+                // unset($item->trash_bank_id);
+                unset($item->updated_at);
+                unset($item->iot_id);
+                unset($item->user_balance);
+                unset($item->admin_balance);
+                unset($item->status);
+                unset($item->created_at);
+                unset($item->id);
+
+                return $item;
+            });
+            // dd($dataShow);
+            return $this->success('Sukses menambahkan store sampah',$dataShow, 200);
+        // } catch (\Exception $e) {
+        //     DB::rollBack();
+        //     return $this->error("Failed", 401);
+        // }
     }
 
     public function storeIOT(Request $request)
