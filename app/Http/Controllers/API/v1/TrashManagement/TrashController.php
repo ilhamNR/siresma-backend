@@ -32,11 +32,9 @@ class TrashController extends Controller
                 unset($item->iot_id);
 
                 // hide iot timestamp
-                if (isset($item->iot))
-                {
-                    $item->weight = $item->iot->weight;
+                if (isset($item->iot)) {
                     unset($item->iot->created_at);
-                    unset($item->iot);
+                    unset($item->iot->updated_at);
                 }
                 //hide trash category_id
                 unset($item->trash_category_id);
