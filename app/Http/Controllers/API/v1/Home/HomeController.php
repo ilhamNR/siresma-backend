@@ -17,7 +17,7 @@ class HomeController extends Controller
         try {
             if (isset(Auth::user()->trash_bank_id)) {
                 $location = TrashBank::select('id', 'name', 'description')->findorFail(Auth::user()->trash_bank_id);
-                return $this->success("success", $location, 200);
+                return $this->success("Sukses mendapatkan data home", $location, 200);
             } else{
                 return $this->success("Anda Belum memilih lokasi bank sampah", NULL, 200);
             }

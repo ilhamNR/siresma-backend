@@ -35,7 +35,7 @@ class NasabahController extends Controller
                 }
                 return $item;
             });
-            return $this->success("Success", $data, 200);
+            return $this->success("Sukses mendapatkan data nasabah", $data, 200);
         } catch (\Exception $e) {
             return $this->error("Failed", 401);
         }
@@ -59,7 +59,7 @@ class NasabahController extends Controller
                 }
                 return $item;
             });
-            return $this->success("Success", $data, 200);
+            return $this->success("Sukses mendapatkan data detail nasabah", $data, 200);
         } catch (\Exception $e) {
             return $this->error("Failed", 401);
         }
@@ -109,7 +109,7 @@ class NasabahController extends Controller
                 }
             );
 
-            return $this->success("Success", $data, 200);
+            return $this->success("Sukses mendapatkan data transaksi", $data, 200);
         } catch (\Exception $e) {
             return $this->error("Failed", 401);
         }
@@ -146,7 +146,7 @@ class NasabahController extends Controller
                     return $item;
                 }
             );
-            return $this->success("Success", $data, 200);
+            return $this->success("Sukses mendapatkan data transaksi masuk", $data, 200);
         } catch (\Exception $e) {
             return $this->error("Failed", 401);
         }
@@ -171,7 +171,7 @@ class NasabahController extends Controller
                 }
             );
             // $data = $data->toArray();
-            return $this->success("Success", $data, 200);
+            return $this->success("Sukses mendapatkan data transaksi keluar", $data, 200);
         } catch (\Exception $e) {
             return $this->error("Failed", 401);
         }

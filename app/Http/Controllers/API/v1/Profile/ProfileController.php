@@ -41,7 +41,7 @@ class ProfileController extends Controller
             "no_kk" => $user->no_kk,
             "profile_picture" => $profile_picture
         );
-        return $this->success("Success", $data, 200);
+        return $this->success("Sukses mendapatkan data profil user", $data, 200);
     }
 
     public function updateProfile(UpdateProfileRequest $request)

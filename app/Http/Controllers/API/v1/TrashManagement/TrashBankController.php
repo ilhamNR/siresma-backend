@@ -17,7 +17,7 @@ class TrashBankController extends Controller
     {
         try {
             $trashBank = TrashBank::all();
-            return $this->success("Success", $trashBank, 200);
+            return $this->success("Sukses mendapatkan daftar bank sampah", $trashBank, 200);
         } catch (\Exception $e) {
             return $this->error("Failed", 401);
         }
@@ -25,15 +25,21 @@ class TrashBankController extends Controller
 
     public function chooseBankSampah(Request $request)
     {
-        try {
-            $user = User::findOrFail(Auth::user()->id);
-            // dd($user);
-            $user->update([
-                'trash_bank_id' => $request->trash_bank_id
-            ]);
-            return $this->success("Success", null, 200);
-        } catch (\Exception $e) {
-            return $this->error("Failed", 401);
+
+        $user = User::findOrFail(Auth::user()->id);
+        // dd(TrashBank::where('id', $request->trash_bank_id));
+        if (is_null(TrashBank::where('id', $request->trash_bank_id)->first())) {
+            return $this->error("Lokasi Bank sampah tidak ditemukan", 401);
+        } else {
+            try {
+                $user->update([
+                    'trash_bank_id' => $request->trash_bank_id
+                ]);
+            } catch (\Exception $e) {
+                return $this->error("Failed", 401);
+            }
+            $trashBank = TrashBank::findOrFail($user->trash_bank_id);
+            return $this->success("Sukses memilih bank sampah", $trashBank->id, 200);
         }
     }
 }

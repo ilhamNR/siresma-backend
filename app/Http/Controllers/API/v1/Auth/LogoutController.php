@@ -15,7 +15,7 @@ class LogoutController extends Controller
     {
         try {
             Auth::user()->currentAccessToken()->delete();
-            return $this->success("Success", null, 200);
+            return $this->success("Logout sukses", null, 200);
         } catch (\Exception $e) {
             return $this->error("Failed", 401);
         }
