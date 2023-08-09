@@ -76,7 +76,11 @@ class TrashController extends Controller
     }
     public function storeTrash(Request $request)
     {
-        // try {
+        try {
+            $user = Auth::user();
+            if (is_null($user->trash_bank_id)){
+                return $this->error("Harap pilih bank sampah terlebih dahulu!", 401);
+            }
             DB::beginTransaction();
             $data = GarbageSavingsData::create([
                 'user_id' => Auth::user()->id,
@@ -102,10 +106,10 @@ class TrashController extends Controller
             });
             // dd($dataShow);
             return $this->success('Sukses menambahkan store sampah',$dataShow, 200);
-        // } catch (\Exception $e) {
-        //     DB::rollBack();
-        //     return $this->error("Failed", 401);
-        // }
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->error("Failed", 401);
+        }
     }
 
     public function storeIOT(Request $request)
