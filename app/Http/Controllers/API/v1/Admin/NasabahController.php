@@ -17,7 +17,7 @@ class NasabahController extends Controller
     public function getAllUsers()
     {
         try {
-            $data = User::where('role', 'nasabah')->get();
+            $data = User::where('role', 'nasabah')->where('trash_bank_id', Auth::user()->trash_bank_id)->get();
             $data = $data->map(function ($item) {
                 // hide unshown column
                 unset($item->username);
