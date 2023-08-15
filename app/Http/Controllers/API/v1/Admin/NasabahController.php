@@ -17,7 +17,7 @@ class NasabahController extends Controller
     public function getAllUsers()
     {
         try {
-            $data = User::where('role', 'nasabah')->get();
+            $data = User::where('role', 'nasabah')->where('trash_bank_id', Auth::user()->trash_bank_id)->get();
             $data = $data->map(function ($item) {
                 // hide unshown column
                 unset($item->username);
@@ -133,7 +133,7 @@ class NasabahController extends Controller
             $data = $data->map(
                 function ($item) {
                     // hide unshown column
-                    $item['name'] = User::findOrFail($item['user_id'])->first()->full_name;
+                    $item['name'] = User::findOrFail($item['user_id'])->full_name;
                     $item['store_date'] = $item->garbageSavingsData->store_date;
                     unset($item['type']);
                     unset($item['trash_bank_id']);
@@ -159,7 +159,7 @@ class NasabahController extends Controller
             $data = $data->map(
                 function ($item) {
                     // hide unshown column
-                    $item['name'] = User::findOrFail($item['user_id'])->first()->full_name;
+                    $item['name'] = User::findOrFail($item['user_id'])->full_name;
                     unset($item['type']);
                     unset($item['garbage_savings_data_id']);
                     unset($item['user_id']);

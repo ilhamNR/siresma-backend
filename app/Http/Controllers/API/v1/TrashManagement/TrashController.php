@@ -32,11 +32,9 @@ class TrashController extends Controller
                 unset($item->iot_id);
 
                 // hide iot timestamp
-                if (isset($item->iot))
-                {
-                    $item->weight = $item->iot->weight;
+                if (isset($item->iot)) {
                     unset($item->iot->created_at);
-                    unset($item->iot);
+                    unset($item->iot->updated_at);
                 }
                 //hide trash category_id
                 unset($item->trash_category_id);
@@ -78,7 +76,11 @@ class TrashController extends Controller
     }
     public function storeTrash(Request $request)
     {
-        // try {
+        try {
+            $user = Auth::user();
+            if (is_null($user->trash_bank_id)){
+                return $this->error("Harap pilih bank sampah terlebih dahulu!", 401);
+            }
             DB::beginTransaction();
             $data = GarbageSavingsData::create([
                 'user_id' => Auth::user()->id,
@@ -104,10 +106,10 @@ class TrashController extends Controller
             });
             // dd($dataShow);
             return $this->success('Sukses menambahkan store sampah',$dataShow, 200);
-        // } catch (\Exception $e) {
-        //     DB::rollBack();
-        //     return $this->error("Failed", 401);
-        // }
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->error("Failed", 401);
+        }
     }
 
     public function storeIOT(Request $request)
@@ -262,7 +264,8 @@ class TrashController extends Controller
                 $garbage_savings_data->update([
                     'iot_id' =>  $iot_data->id,
                     'user_balance' => $user_balance,
-                    'admin_balance' => $admin_balance
+                    'admin_balance' => $admin_balance,
+                    'status' => "DONE"
                 ]);
                 DB::commit();
 
