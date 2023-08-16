@@ -78,7 +78,7 @@ class NasabahController extends Controller
                     $totalUserBalance += $item['user_balance'];
                 }
             }
-            // get user balance
+            // get admin balance
             $totalAdminBalance = 0;
             foreach ($transaction_data as $item) {
                 if (isset($item['admin_balance']) && is_numeric($item['admin_balance'])) {
