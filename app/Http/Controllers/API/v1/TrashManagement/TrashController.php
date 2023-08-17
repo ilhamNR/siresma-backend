@@ -24,9 +24,11 @@ class TrashController extends Controller
 
     public function list()
     {
-        // try {
+        try {
             $user = Auth::user()->id;
+            $balance = TrashController::getBalance($user);
             $data = GarbageSavingsData::where('user_id', $user)->with('trashCategory')->with('iot')->get();
+
             $data = $data->map(function ($item) {
                 // hide iot id
                 unset($item->iot_id);
@@ -45,20 +47,26 @@ class TrashController extends Controller
                     unset($item->trashCategory);
                 }
 
-                if ($item->status == "ON_PROCESS"){
+                if ($item->status == "ON_PROCESS") {
                     $item->status = "Masih dalam Proses";
-                } else if ($item->status == "DONE"){
+                } else if ($item->status == "DONE") {
                     $item->status = "Selesai";
                 } else
-                unset($item->iot);
+                    unset($item->iot);
                 unset($item->trashCategory);
 
                 return $item;
             });
-            return $this->success('Success', $data, 200);
-        // } catch (\Exception $e) {
-        //     return $this->error("Failed", 401);
-        // }
+            // $data['user_balance'] = $balance;
+            $finalData = [
+                "user_balance" => $balance,
+                "trash_store_logs" => $data->values(), // Reset array keys
+            ];
+
+            return $this->success('Success', $finalData, 200);
+        } catch (\Exception $e) {
+            return $this->error("Failed", 401);
+        }
     }
 
     public function generateCode()
@@ -105,7 +113,7 @@ class TrashController extends Controller
                 return $item;
             });
             // dd($dataShow);
-            return $this->success('Sukses menambahkan store sampah',$dataShow, 200);
+            return $this->success('Sukses menambahkan store sampah', $dataShow, 200);
         } catch (\Exception $e) {
             DB::rollBack();
             return $this->error("Failed", 401);
@@ -312,8 +320,14 @@ class TrashController extends Controller
     public function getTransactionList()
     {
         try {
-            $data = TransactionLog::where("user_id", Auth::user()->id)->get();
-            return $this->success("Sukses mendapatkan data transaksi", $data, 200);
+            $user = Auth::user();
+            $data = TransactionLog::where("user_id", $user->id)->get();
+            $balance = TrashController::getBalance($user->id);
+            $finalData = [
+                "user_balance" => $balance,
+                "transaction_list" => $data->values(), // Reset array keys
+            ];
+            return $this->success("Sukses mendapatkan data transaksi", $finalData, 200);
         } catch (\Exception $e) {
             return $this->error("Failed", 401);
         }

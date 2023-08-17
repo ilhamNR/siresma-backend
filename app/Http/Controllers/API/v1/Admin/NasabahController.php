@@ -11,6 +11,7 @@ use App\Models\GarbageSavingsData;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
+
 class NasabahController extends Controller
 {
     use APIResponseTrait;
@@ -43,22 +44,22 @@ class NasabahController extends Controller
     public function getNasabahDetails(Request $request)
     {
         try {
-            $data = User::findOrFail($request->user_id)->get();
-            $data = $data->map(function ($item) {
-                // hide unshown column
-                unset($item->username);
-                unset($item->email);
-                unset($item->trash_bank_id);
-                unset($item->role);
-                unset($item->is_verified);
-                unset($item->created_at);
-                unset($item->updated_at);
-
-                if (is_null($item->profile_picture)) {
-                    $item->profile_picture = asset('NULLpp.png');
-                }
-                return $item;
-            });
+            $user = User::where('id', $request->user_id)->first();
+            if (is_null($user)){
+                return $this->error("User tidak ditemukan", 404);
+            }
+            if ($user->profile_picture == ("" or NULL)) {
+                $profile_picture = asset('NULLpp.png');
+            } else {
+                $profile_picture = asset('storage/profile_picture/' . $user->profile_picture);
+            }
+            $data = array(
+                "id" => $user->id,
+                "full_name" => $user->full_name,
+                "phone" => $user->phone,
+                "address" => $user->address,
+                "profile_picture" => $profile_picture
+            );
             return $this->success("Sukses mendapatkan data detail nasabah", $data, 200);
         } catch (\Exception $e) {
             return $this->error("Failed", 401);
@@ -78,7 +79,7 @@ class NasabahController extends Controller
                     $totalUserBalance += $item['user_balance'];
                 }
             }
-            // get user balance
+            // get admin balance
             $totalAdminBalance = 0;
             foreach ($transaction_data as $item) {
                 if (isset($item['admin_balance']) && is_numeric($item['admin_balance'])) {
@@ -203,13 +204,13 @@ class NasabahController extends Controller
     }
     public function completeTrashStore(Request $request)
     {
-        
+
 
         $garbage_savings_data = GarbageSavingsData::where('id', $request->garbage_savings_id)->first();
         // $applicant = User::findOrFail($transaction->user_id);
         $pengelola_location = Auth::user()->trash_bank_id;
         // dd($garbage_savings_data);
-        if(is_null($garbage_savings_data)){
+        if (is_null($garbage_savings_data)) {
             return $this->error("Data tidak ditemukan", 401);
         } else if ($garbage_savings_data->trash_bank_id != $pengelola_location) {
             return $this->error("Lokasi bank sampah anda dan pengajuan tidak sesuai", 401);
