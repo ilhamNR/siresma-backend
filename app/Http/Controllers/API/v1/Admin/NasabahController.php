@@ -58,7 +58,8 @@ class NasabahController extends Controller
                 "full_name" => $user->full_name,
                 "phone" => $user->phone,
                 "address" => $user->address,
-                "profile_picture" => $profile_picture
+                "profile_picture" => $profile_picture,
+                "no_kk" => $user->no_kk
             );
             return $this->success("Sukses mendapatkan data detail nasabah", $data, 200);
         } catch (\Exception $e) {
