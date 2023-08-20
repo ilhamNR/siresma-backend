@@ -120,11 +120,11 @@ class OTPController extends Controller
             $otpTimeDifference = $otpCreationTime->diffInSeconds($now);
         };
         if (is_null($user)) {
-            return $this->error("User tidak ditemukan", 401);
+            return $this->error("User tidak ditemukan", 404);
         } else if ($user->is_verified == 1) {
             return $this->error("User telah terverifikasi", 401);
         } else if (is_null($otp)) {
-            return $this->error("OTP tidak valid", 401);
+            return $this->error("OTP tidak valid", 404);
         } else if ($otp->user_id != $request->user_id) {
             return $this->error("OTP ini bukan untuk anda", 401);
         } else if ($otpTimeDifference > 120) {

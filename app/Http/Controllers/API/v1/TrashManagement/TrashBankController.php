@@ -29,7 +29,7 @@ class TrashBankController extends Controller
         $user = User::findOrFail(Auth::user()->id);
         // dd(TrashBank::where('id', $request->trash_bank_id));
         if (is_null(TrashBank::where('id', $request->trash_bank_id)->first())) {
-            return $this->error("Lokasi Bank sampah tidak ditemukan", 401);
+            return $this->error("Lokasi Bank sampah tidak ditemukan", 404);
         } else {
             try {
                 $user->update([

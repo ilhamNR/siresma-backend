@@ -66,9 +66,9 @@ class RegisterController extends Controller
     {
         $user = User::findOrfail($request->user_id);
         if (is_null($user)) {
-            return $this->error("Akun tidak ditemukan", 401);
+            return $this->error("Akun tidak ditemukan", 404);
         } else if ($user->is_verified === 1) {
-            return $this->error("Akun telah terverifikasi", 401);
+            return $this->error("Akun telah terverifikasi", 404);
         } else {
             try {
                 DB::beginTransaction();

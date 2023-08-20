@@ -87,7 +87,7 @@ class TrashController extends Controller
         try {
             $user = Auth::user();
             if (is_null($user->trash_bank_id)){
-                return $this->error("Harap pilih bank sampah terlebih dahulu!", 401);
+                return $this->error("Harap pilih bank sampah terlebih dahulu!", 404);
             }
             DB::beginTransaction();
             $data = GarbageSavingsData::create([
@@ -248,18 +248,18 @@ class TrashController extends Controller
         $iot_data = IOT::where('code', $request->code)->first();
         $garbage_savings_data = GarbageSavingsData::findOrFail($request->garbage_savings_data_id);
         if (is_null($iot_data)) {
-            return $this->error("Kode tidak valid", 401);
+            return $this->error("Kode tidak valid", 404);
         }
         $redeemed_iot = GarbageSavingsData::where('iot_id', $iot_data->id)->first();
 
         if (isset($redeemed_iot)) {
             return $this->error("IOT sudah dihubungkan ke data sampah lain", 401);
         } else if (is_null($garbage_savings_data)) {
-            return $this->error("Data stor sampah tidak valid", 401);
+            return $this->error("Data stor sampah tidak valid", 404);
         } else if ($garbage_savings_data->user_id != Auth::user()->id) {
             return $this->error("Data Sampah ini bukan milik anda", 401);
         } else if (is_null(TrashCategory::where('id', $garbage_savings_data->trash_category_id)->first())) {
-            return $this->error("Kategori sampah tidak valid", 401);
+            return $this->error("Kategori sampah tidak valid", 404);
         } else {
 
             try {

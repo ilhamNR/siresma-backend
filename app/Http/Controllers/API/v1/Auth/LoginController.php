@@ -17,7 +17,7 @@ class LoginController extends Controller
     {
         try {
             if (is_null(User::where('username', $request->username)->first())) {
-                return $this->error("Username tidak ditemukan", 401);
+                return $this->error("Username tidak ditemukan", 404);
             } else if (User::where('username', $request->username)->first()->is_verified == 0) {
                 $otpController = new OTPController(); // Instantiate an object of OTPController
                 $otpController->createOTP(User::where('username', $request->username)->first()->id);
