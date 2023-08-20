@@ -86,7 +86,7 @@ class TrashController extends Controller
     {
         try {
             $user = Auth::user();
-            if (is_null($user->trash_bank_id)){
+            if (is_null($user->trash_bank_id)) {
                 return $this->error("Harap pilih bank sampah terlebih dahulu!", 404);
             }
             DB::beginTransaction();
@@ -97,7 +97,7 @@ class TrashController extends Controller
                 'store_date' => $request->store_date
             ]);
             DB::commit();
-            $dataShow = GarbageSavingsData::where('id',$data->id)->get();
+            $dataShow = GarbageSavingsData::where('id', $data->id)->get();
             $dataShow = $dataShow->map(function ($item) {
                 // hide unshown column
                 unset($item->user_id);
@@ -317,17 +317,40 @@ class TrashController extends Controller
             return $this->error("Failed", 401);
         }
     }
-    public function getTransactionList()
+    public function getTransactionList(Request $request)
     {
         try {
             $user = Auth::user();
             $data = TransactionLog::where("user_id", $user->id)->get();
-            $balance = TrashController::getBalance($user->id);
-            $finalData = [
-                "user_balance" => $balance,
-                "transaction_list" => $data->values(), // Reset array keys
-            ];
-            return $this->success("Sukses mendapatkan data transaksi", $finalData, 200);
+            if (isset($data)) {
+                //get oldest data
+                $oldestData = collect($data)->sortBy('created_at')->first();
+
+                //get newest data
+                $newestData = collect($data)->sortByDesc('created_at')->first();
+                // dd($newestData);
+                if (isset($request->month_filter)) {
+                    $monthFilter = Carbon::createFromFormat('m-Y', $request->month_filter);
+
+                    // Filter the collection based on the specified month and year
+                    $data = collect($data)->filter(function ($item) use ($monthFilter) {
+                        $createdAt = Carbon::parse($item['created_at']);
+                        return $createdAt->month == $monthFilter->month && $createdAt->year == $monthFilter->year;
+                    });
+                }
+
+                $balance = TrashController::getBalance($user->id);
+                $finalData = [
+                    "user_balance" => $balance,
+                    "oldest_data_month" => Carbon::parse($oldestData->created_at)->format('m-Y'),
+                    "newest_data_month" => Carbon::parse($newestData->created_at)->format('m-Y'),
+                    "transaction_list" => $data->values(), // Reset array keys
+
+                ];
+                return $this->success("Sukses mendapatkan data transaksi", $finalData, 200);
+            } else {
+                return $this->error("Data transaksi masih kosong", 404);
+            }
         } catch (\Exception $e) {
             return $this->error("Failed", 401);
         }
