@@ -33,6 +33,8 @@ class NasabahController extends Controller
 
                 if (is_null($item->profile_picture)) {
                     $item->profile_picture = asset('NULLpp.png');
+                } else {
+                    $item->profile_picture = asset('storage/profile_picture/' . $item->profile_picture);
                 }
                 return $item;
             });
