@@ -11,6 +11,7 @@ use App\Http\Controllers\API\v1\Auth\LogoutController;
 use App\Http\Controllers\API\v1\Auth\OTPController;
 use App\Http\Controllers\API\v1\Admin\NasabahController;
 use App\Http\Controllers\API\v1\Profile\ProfileController;
+use App\Http\Controllers\API\v1\Transaction\TransactionController;
 use Symfony\Component\HttpKernel\Profiler\Profile;
 
 /*
@@ -56,8 +57,8 @@ Route::group(['prefix' => 'trash', 'middleware' => ['auth:sanctum']], function (
 });
 
 Route::group(['prefix' => 'transaction', 'middleware' =>['auth:sanctum']], function(){
-    Route::post('withdraw', [TrashController::class, 'withdraw']);
-    Route::get('list', [TrashController::class, 'getTransactionList']);
+    Route::post('withdraw', [TransactionController::class, 'withdraw']);
+    Route::get('list', [TransactionController::class, 'getTransactionList']);
 });
 
 Route::group(['prefix' => 'iot'], function () {
