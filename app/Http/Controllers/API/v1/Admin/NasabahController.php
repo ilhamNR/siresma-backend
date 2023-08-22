@@ -104,7 +104,6 @@ class NasabahController extends Controller
                     }
 
                     // hide unshown column
-                    unset($item->type);
                     unset($item->user_id);
                     unset($item->is_approved);
                     unset($item->garbage_savings_data_id);
