@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\File;
+use Illuminate\Support\Facades\Auth;
 
 class UpdateProfileRequest extends FormRequest
 {
@@ -27,8 +28,8 @@ class UpdateProfileRequest extends FormRequest
         return [
             'full_name' => request()->route('auth/registration') ? 'required|max:255' . request()->route('auth/registration')
                 : 'required|max:255',
-            'phone' => request()->route('auth/registration') ? 'required|min:10|max:13|unique:users,phone' . request()->route('auth/registration')
-                : 'required||min:10|max:13|unique:users,phone',
+            'phone' => request()->route('auth/registration') ? 'required|min:10|max:13|unique:users,phone,' . Auth::user()->id . '' . request()->route('auth/registration')
+                : 'required||min:10|max:13|unique:users,phone,' . Auth::user()->id . '',
             'address' => request()->route('auth/registration') ? 'required|max:255' . request()->route('auth/registration')
                 : 'required|max:255',
             'profile_picture' =>  request()->route('auth/registration') ? 'nullable' . request()->route('auth/registration') : File::image()->max(5120),
