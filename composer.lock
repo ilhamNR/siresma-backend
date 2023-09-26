@@ -6,6 +6,7 @@
     ],
     "content-hash": "3889cb3db3aadf33046b6816d24eb180",
     "packages": [
+            "name": "abe/cache-for-laravel-sanctum",
         {
             "name": "brick/math",
             "version": "0.11.0",
