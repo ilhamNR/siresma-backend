@@ -16,6 +16,7 @@ use Carbon\Carbon;
 use App\Http\Controllers\API\v1\Transaction\TransactionController;
 use GrahamCampbell\ResultType\Success;
 use App\Models\User;
+use App\Jobs\ProcessIOTData;
 
 use function PHPSTORM_META\map;
 
@@ -138,7 +139,7 @@ class TrashController extends Controller
         }
     }
 
-   
+
     public function connectIOT(Request $request)
     {
         $redeemed_iot = NULL;
@@ -158,30 +159,9 @@ class TrashController extends Controller
         } else if (is_null(TrashCategory::where('id', $garbage_savings_data->trash_category_id)->first())) {
             return $this->error("Kategori sampah tidak valid", 404);
         } else {
+            ProcessIOTData::dispatch($garbage_savings_data, $iot_data);
 
-            try {
-                // calculate price
-                $total_price = new TransactionController();
-                $total_price = $total_price->calculatePrice($garbage_savings_data, $iot_data->weight);
-                $admin_balance = $total_price * 40 / 100;
-                $user_balance = $total_price * 60 / 100;
-
-                DB::beginTransaction();
-                $garbage_savings_data->update([
-                    'iot_id' =>  $iot_data->id,
-                    'user_balance' => $user_balance,
-                    'admin_balance' => $admin_balance,
-                    'status' => "DONE"
-                ]);
-                DB::commit();
-
-                $create_transaction = new TransactionController();
-                $create_transaction->createTransactionLog($user_balance, $garbage_savings_data->user_id, "STORE", $garbage_savings_data);
-                return $this->success("Data IOT sudah terhubung", 200);
-            } catch (\Exception $e) {
-                DB::rollBack();
-                return $this->error("Failed", 401);
-            }
+            return $this->success("Data IOT akan diproses", 200);
         }
     }
 
