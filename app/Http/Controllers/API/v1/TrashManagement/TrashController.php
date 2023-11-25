@@ -138,7 +138,7 @@ class TrashController extends Controller
         }
     }
 
-   
+
     public function connectIOT(Request $request)
     {
         $redeemed_iot = NULL;
@@ -163,8 +163,8 @@ class TrashController extends Controller
                 // calculate price
                 $total_price = new TransactionController();
                 $total_price = $total_price->calculatePrice($garbage_savings_data, $iot_data->weight);
-                $admin_balance = $total_price * 40 / 100;
-                $user_balance = $total_price * 60 / 100;
+                $admin_balance = $total_price * 30 / 100;
+                $user_balance = $total_price * 70 / 100;
 
                 DB::beginTransaction();
                 $garbage_savings_data->update([
